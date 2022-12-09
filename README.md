@@ -1,6 +1,9 @@
 # Simplex Calculator
 
-This is a simple Java console application for linear programming problems using the Two-Phase-Simplex method.
+This is a simple Java console app for linear programming problems using the Two-Phase-Simplex method.
+
+![Demo](/media/simplex-calculator-demo.gif)
+For a longer demo see [simplex-calculator-demo](https://drive.google.com/drive/folders/1gH_82MVWjv0lWRdNeFJ7r9ySENtS2a6k?usp=sharing>).
 
 **The calculator can detect optimal solutions to any linear problem. It supports two modes:**
 * **Exact:** Calculation with simplified fractions
@@ -16,3 +19,5 @@ This is a simple Java console application for linear programming problems using 
 * Detection for problems without an optimal solution
 * Input for equalities with *'='*
 * Support for minimisation problems
+
+Enjoy!
