@@ -13,8 +13,8 @@ import java.util.Scanner;
 
 import static com.danielptv.simplex.entity.Fraction.FRACTION_PATTERN;
 import static com.danielptv.simplex.entity.RoundedDecimal.ROUNDED_DECIMAL_PATTERN;
-import static com.danielptv.simplex.presentation.OutputUtils.ANSI_RED;
-import static com.danielptv.simplex.presentation.OutputUtils.ANSI_RESET;
+import static com.danielptv.simplex.presentation.OutputUtils.FONT_RED;
+import static com.danielptv.simplex.presentation.OutputUtils.STYLE_RESET;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
 
@@ -39,6 +39,7 @@ public final class InputUtils {
         final var restrictCount = tableDTO.getConstraintCount();
         final var input = new ArrayList<List<String>>();
 
+        out.println();
         input.add(getObjectiveFunc(varCount, pattern));
         input.addAll(getRestrictions(varCount, restrictCount, pattern));
 
@@ -59,7 +60,7 @@ public final class InputUtils {
         var falseInputCount = 0;
         while (true) {
             if (falseInputCount > 0) {
-                out.print(ANSI_RED + "  Rounded results? [y/n] " + ANSI_RESET);
+                out.print(FONT_RED + "  Rounded results? [y/n] " + STYLE_RESET);
             } else {
                 out.print("  Rounded results? [y/n] ");
             }
@@ -75,7 +76,7 @@ public final class InputUtils {
             falseInputCount = 0;
             while (true) {
                 if (falseInputCount > 0) {
-                    out.print(ANSI_RED + "  Mantissa length: " + ANSI_RESET);
+                    out.print(FONT_RED + "  Mantissa length: " + STYLE_RESET);
                 } else {
                     out.print("  Mantissa length: ");
                 }
@@ -87,7 +88,6 @@ public final class InputUtils {
                 falseInputCount++;
             }
         }
-
 
         final var varCount = getCount("variables");
         final var constraintCount = getCount("constraints");
@@ -111,7 +111,7 @@ public final class InputUtils {
 
         while (true) {
             if (falseInputCount > 0) {
-                out.print(ANSI_RED + "  Number of " + varOrConstraint + ": " + ANSI_RESET);
+                out.print(FONT_RED + "  Number of " + varOrConstraint + ": " + STYLE_RESET);
             } else {
                 out.print("  Number of " + varOrConstraint + ": ");
             }
@@ -140,7 +140,7 @@ public final class InputUtils {
         var falseInputCount = 0;
         while (true) {
             if (falseInputCount > 0) {
-                out.print(ANSI_RED + "  Objective function: " + ANSI_RESET);
+                out.print(FONT_RED + "  Objective function: " + STYLE_RESET);
             } else {
                 out.print("  Objective function: ");
             }
@@ -176,7 +176,7 @@ public final class InputUtils {
             var falseInputCount = 0;
             while (true) {
                 if (falseInputCount > 0) {
-                    out.print(ANSI_RED + "  R" + i + ": " + ANSI_RESET);
+                    out.print(FONT_RED + "  R" + i + ": " + STYLE_RESET);
                 } else {
                     out.print("  R" + i + ": ");
                 }

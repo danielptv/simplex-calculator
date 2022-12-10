@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.danielptv.simplex.presentation.OutputUtils.ANSI_BACKGROUND_GREEN;
-import static com.danielptv.simplex.presentation.OutputUtils.ANSI_RESET;
+import static com.danielptv.simplex.presentation.OutputUtils.BACKGROUND_GREEN;
+import static com.danielptv.simplex.presentation.OutputUtils.STYLE_RESET;
 import static java.lang.String.format;
 
 /**
@@ -162,7 +162,7 @@ public class Row<T extends CalculableImpl<T>> {
                     final var width = entryWidths.get(e);
                     final var entry = entries.get(e);
                     if (pivotPos != null && pivotPos > -1 && e == pivotPos) {
-                        sb.append(format("|" + ANSI_BACKGROUND_GREEN + "  %-" + width + "s  " + ANSI_RESET, entry));
+                        sb.append(format("|" + BACKGROUND_GREEN + "  %-" + width + "s  " + STYLE_RESET, entry));
                     } else {
                         sb.append(format("|  %-" + width + "s  ", entry));
                     }

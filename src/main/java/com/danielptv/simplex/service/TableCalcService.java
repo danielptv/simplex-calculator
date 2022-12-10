@@ -74,26 +74,21 @@ final class TableCalcService {
     /**
      * Method for setting the pivot element of a table.
      *
-     * @param lHS                 The left-hand side of the table.
-     * @param rHS                 The right-hand side of the table.
-     * @param extendedLHS         The extended left-hand side of the table.
-     * @param isSimplexAcceptable Whether the table is a valid Simplex-Table.
-     * @param inst                Fraction or RoundedDecimal.
-     * @param <T>                 Fraction or RoundedDecimal.
+     * @param lHS         The left-hand side of the table.
+     * @param rHS         The right-hand side of the table.
+     * @param extendedLHS The extended left-hand side of the table.
+     * @param inst        Fraction or RoundedDecimal.
+     * @param <T>         Fraction or RoundedDecimal.
      * @return The pivot element.
      */
     @SuppressWarnings("ReturnCount")
-    static <T extends CalculableImpl<T>> Pivot setPivot(@NonNull final List<Row<T>> lHS, @NonNull final List<T> rHS,
+    static <T extends CalculableImpl<T>> Pivot setPivot(@NonNull final List<Row<T>> lHS,
+                                                        @NonNull final List<T> rHS,
                                                         final List<Row<T>> extendedLHS,
-                                                        final boolean isSimplexAcceptable,
-                                                        @NonNull final T inst) {
-        final var isExtended = extendedLHS != null;
-        if (!isSimplexAcceptable && !isExtended) {
-            return null;
-        }
-
+                                                        @NonNull final T inst
+    ) {
         final var column = lHS.get(0).getMinIndex();
-        final var row = getPivotRow(lHS, rHS, isExtended, column, inst);
+        final var row = getPivotRow(lHS, rHS, extendedLHS != null, column, inst);
         return new Pivot(column, row);
     }
 
@@ -129,10 +124,10 @@ final class TableCalcService {
     /**
      * Method for determining whether a table meets the criteria for a Simplex-Table.
      *
-     * @param rHS  The right-hand side of the table.
+     * @param rHS        The right-hand side of the table.
      * @param isExtended Whether the table is extended.
-     * @param inst Fraction or RoundedDecimal.
-     * @param <T>  Fraction or RoundedDecimal.
+     * @param inst       Fraction or RoundedDecimal.
+     * @param <T>        Fraction or RoundedDecimal.
      * @return True if table is a valid Simplex-Table else false.
      */
     static <T extends CalculableImpl<T>> boolean isSimplexAcceptable(final List<T> rHS, final boolean isExtended,
@@ -153,19 +148,13 @@ final class TableCalcService {
     /**
      * Method for determining whether a table is an optimal Simplex-Table.
      *
-     * @param isSimplexAcceptable Whether the table is a valid Simplex-Table.
-     * @param lHS                 The left-hand side of the table.
-     * @param rHS                 The right-hand side of the table.
-     * @param inst                Fraction or RoundedDecimal.
-     * @param <T>                 Fraction or RoundedDecimal.
+     * @param lHS         The left-hand side of the table.
+     * @param extendedLHS The extended left-hand side of the table.
+     * @param <T>         Fraction or RoundedDecimal.
      * @return True if the table is optimal else false.
      */
-    static <T extends CalculableImpl<T>> boolean isOptimal(final boolean isSimplexAcceptable,
-                                                           @NonNull final List<Row<T>> lHS,
-                                                           @NonNull final List<T> rHS, @NonNull final T inst) {
-        if (!isSimplexAcceptable) {
-            return false;
-        }
-        return rHS.get(0).compareTo(inst.create("0")) >= 0 && lHS.get(0).isPositive();
+    static <T extends CalculableImpl<T>> boolean isOptimal(@NonNull final List<Row<T>> lHS,
+                                                           final List<Row<T>> extendedLHS) {
+        return lHS.get(0).isPositive() && (extendedLHS == null || extendedLHS.get(0).isPositive());
     }
 }

@@ -59,6 +59,13 @@ public final class TwoPhaseSimplex {
                 phase.addTable(new Table<>(table, "ITERATION " + count));
                 count++;
                 isSimplexAcceptable = isSimplexAcceptable(table.getRHS(), true, inst);
+
+                if (isOptimal(table.getLHS(), table.getExtendedLHS()) &&
+                        !table.getRHS().get(0).equals(inst.create("0"))) {
+                    phase.setSolvable(false);
+                    result.add(phase);
+                    return result;
+                }
             }
             table = removeExtension(table);
         }
@@ -73,13 +80,11 @@ public final class TwoPhaseSimplex {
         phase2.addTable(new Table<>(table, "INITIAL TABLE"));
         count = 1;
 
-        var isSimplexAcceptable = isSimplexAcceptable(table.getRHS(), false, inst);
-        var isOptimal = isOptimal(isSimplexAcceptable, table.getLHS(), table.getRHS(), inst);
+        var isOptimal = isOptimal(table.getLHS(), table.getExtendedLHS());
         while (!isOptimal) {
             table = transform(table);
             phase2.addTable(new Table<>(table, "ITERATION " + count));
-            isSimplexAcceptable = isSimplexAcceptable(table.getRHS(), false, inst);
-            isOptimal = isOptimal(isSimplexAcceptable, table.getLHS(), table.getRHS(), inst);
+            isOptimal = isOptimal(table.getLHS(), table.getExtendedLHS());
             count++;
         }
         result.add(phase2);
@@ -153,12 +158,10 @@ public final class TwoPhaseSimplex {
                     }
                 });
 
-        final var isSimplexAcceptable = isSimplexAcceptable(rHS, extendedLHS != null, inst);
         final var newPivot = setPivot(
                 lHS,
                 rHS,
                 finalExtendedLHS,
-                isSimplexAcceptable,
                 inst);
 
         return new Table<>(
@@ -212,8 +215,7 @@ public final class TwoPhaseSimplex {
             rHS.set(0, newValRHS);
         }
 
-        final var isSimplexAcceptable = isSimplexAcceptable(rHS, true, inst);
-        final var pivot = setPivot(lHs, rHS, extendedLHS, isSimplexAcceptable, inst);
+        final var pivot = setPivot(lHs, rHS, extendedLHS, inst);
 
         return new Table<>(
                 inst,

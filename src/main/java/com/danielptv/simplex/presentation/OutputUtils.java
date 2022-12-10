@@ -18,19 +18,19 @@ public final class OutputUtils {
     /**
      * String for resetting font and background colour.
      */
-    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String STYLE_RESET = "\u001B[0m";
     /**
      * String for setting the font colour to green.
      */
-    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String FONT_GREEN = "\u001B[32m";
     /**
      * String for setting the font colour to red.
      */
-    public static final String ANSI_RED = "\u001B[31m";
+    public static final String FONT_RED = "\u001B[31m";
     /**
      * String for setting the background colour to green.
      */
-    public static final String ANSI_BACKGROUND_GREEN = "\u001B[42m";
+    public static final String BACKGROUND_GREEN = "\u001B[42m";
     /**
      * String representing the application headline.
      */
@@ -169,7 +169,7 @@ public final class OutputUtils {
         @NonNull final var input = tableDTO.getTable();
         final var restrictCount = tableDTO.getConstraintCount();
 
-        sb.append(String.format("%n%n%n%n")).append(ANSI_GREEN).append(String.format("  INPUT:%n"));
+        sb.append(String.format("%n")).append(FONT_GREEN).append(String.format("  INPUT:%n"));
         sb.append("  ZF: max ");
         IntStream.range(0, input.get(0).size() - 2).forEach(x -> {
             final var pos = input.get(0).size();
@@ -202,7 +202,7 @@ public final class OutputUtils {
             });
             sb.append(String.format("%n"));
         });
-        sb.append(ANSI_RESET);
+        sb.append(STYLE_RESET);
         return sb;
     }
 
@@ -216,10 +216,19 @@ public final class OutputUtils {
     static StringBuilder printPhaseResult(@NonNull final Phase phase) {
         final var sb = new StringBuilder();
         final var table = phase.getTables().get(phase.getTables().size() - 1);
-        sb.append(ANSI_GREEN);
+
+        if (!phase.isSolvable()) {
+            sb.append(FONT_RED);
+            sb.append(String.format("  The problem has no solution (infeasible).%n"));
+            sb.append("  The iterations of the first phase have been completed and there are artificial variables in " +
+                    "the base with values strictly greater than 0.");
+            sb.append(STYLE_RESET);
+            return sb;
+        }
+
+        sb.append(FONT_GREEN);
         sb.append(String.format("  OUTPUT:%n"));
         sb.append("  f(x) = ").append(table.getRHS().get(0).toDecimal().toPlainString()).append(String.format("%n"));
-
         final var variables = table.getColumnHeaders().stream()
                 .filter(e -> e.contains("x"))
                 .toList();
@@ -241,7 +250,7 @@ public final class OutputUtils {
                 sb.append(String.format("0%n"));
             }
         });
-        sb.append(ANSI_RESET);
+        sb.append(STYLE_RESET);
         return sb;
     }
 

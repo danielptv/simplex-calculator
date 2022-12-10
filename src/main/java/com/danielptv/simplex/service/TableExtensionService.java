@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.danielptv.simplex.service.TableCalcService.getNegativeRows;
-import static com.danielptv.simplex.service.TableCalcService.isSimplexAcceptable;
 import static com.danielptv.simplex.service.TableCalcService.setPivot;
 
 /**
@@ -53,8 +52,7 @@ final class TableExtensionService {
         final var rowHeaders = new ArrayList<>(table.getRowHeaders());
         rowHeaders.add(0, "z'");
 
-        final var isSimplexAcceptable = isSimplexAcceptable(rHS, true, inst);
-        final var pivot = setPivot(lHS, rHS, extendedLHS, isSimplexAcceptable, inst);
+        final var pivot = setPivot(lHS, rHS, extendedLHS, inst);
 
         return new Table<>(
                 inst,
@@ -86,12 +84,7 @@ final class TableExtensionService {
         lHS.remove(0);
         final var rHS = new ArrayList<>(table.getRHS());
         rHS.remove(0);
-
-
-        final var isSimplexAcceptable = isSimplexAcceptable(rHS, false, inst);
-
-
-        final var pivot = setPivot(lHS, rHS, null, isSimplexAcceptable, inst);
+        final var pivot = setPivot(lHS, rHS, null, inst);
 
         final var columnHeaders = new ArrayList<>(table.getColumnHeaders());
         IntStream.range(0, table.getExtensionSize())

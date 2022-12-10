@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.danielptv.simplex.service.TableCalcService.getNegativeRows;
-import static com.danielptv.simplex.service.TableCalcService.isSimplexAcceptable;
 import static com.danielptv.simplex.service.TableCalcService.setPivot;
 
 /**
@@ -44,9 +43,7 @@ public final class TableBuildService {
         final var columnHeaders = buildColumnHeaders(varCount, constraintCount);
         final var rowHeadersTemp = buildRowHeaders(constraintCount, getNegativeRows(rHS, inst));
         final var rowHeaders = enumerateRowHeaders(rowHeadersTemp, columnHeaders);
-
-        final var isSimplexAcceptable = isSimplexAcceptable(rHS, false, inst);
-        final var pivot = setPivot(lHS, rHS, null, isSimplexAcceptable, inst);
+        final var pivot = setPivot(lHS, rHS, null, inst);
 
         return new Table<>(inst, " ", lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
     }
