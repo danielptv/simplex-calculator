@@ -12,10 +12,6 @@ import java.math.RoundingMode;
  */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
-    /**
-     * RegEx pattern for a RoundedDecimals.
-     */
-    public static final String ROUNDED_DECIMAL_PATTERN = "-?\\d+(\\.\\d+)?";
     @EqualsAndHashCode.Include
     @Getter
     private final BigDecimal value;
@@ -35,18 +31,28 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
     /**
      * Constructor for a RoundedDecimal.
      *
-     * @param s String representation of the RoundedDecimal.
+     * @param s              String representation of the RoundedDecimal.
      * @param mantissaLength The desired mantissa length.
      */
+    @SuppressWarnings("MagicNumber")
     public RoundedDecimal(@NonNull final String s, final int mantissaLength) {
         this.mantissaLength = mantissaLength;
+        if (s.contains("/")) {
+            final var split = s.split("/");
+            if (split.length != 2 || new BigDecimal("0").equals(new BigDecimal(split[1]))) {
+                throw new IllegalArgumentException();
+            }
+            value = round(new BigDecimal(split[0]).divide(new BigDecimal(split[1]),
+                    mantissaLength + 20, RoundingMode.HALF_EVEN));
+            return;
+        }
         value = round(new BigDecimal(s));
     }
 
     /**
      * Constructor for a RoundedDecimal.
      *
-     * @param b A BigDecimal.
+     * @param b              A BigDecimal.
      * @param mantissaLength The desired mantissa length.
      */
     public RoundedDecimal(@NonNull final BigDecimal b, final int mantissaLength) {

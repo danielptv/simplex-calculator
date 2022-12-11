@@ -173,7 +173,7 @@ public final class OutputUtils {
         sb.append("  ZF: max ");
         IntStream.range(0, input.get(0).size() - 2).forEach(x -> {
             final var pos = input.get(0).size();
-            final var number = input.get(0).get(x).contains("/")
+            final var number = input.get(0).get(x).contains("/") || input.get(0).get(x).contains("-")
                     ? "(" + input.get(0).get(x) + ")"
                     : input.get(0).get(x);
             sb.append(number).append("*").append("x").append(x + 1);
@@ -187,7 +187,7 @@ public final class OutputUtils {
             sb.append("  R").append(x).append(": ");
             IntStream.range(0, input.get(x).size() - 1).forEach(y -> {
                 final var pos = input.get(x).size();
-                final var number = input.get(x).get(y).contains("/")
+                final var number = input.get(x).get(y).contains("/") || input.get(x).get(y).contains("-")
                         ? "(" + input.get(x).get(y) + ")"
                         : input.get(x).get(y);
 

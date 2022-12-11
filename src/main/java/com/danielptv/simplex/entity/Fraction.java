@@ -14,10 +14,6 @@ import java.math.RoundingMode;
  */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Fraction implements CalculableImpl<Fraction> {
-    /**
-     * RegEx pattern for a Fraction.
-     */
-    public static final String FRACTION_PATTERN = "-?\\d+(\\/[0-9]*[1-9][0-9]*)?";
     @EqualsAndHashCode.Include
     @Getter
     private final BigInteger numerator;
@@ -38,14 +34,28 @@ public class Fraction implements CalculableImpl<Fraction> {
      *
      * @param fraction String representation of the numerator.
      */
+    @SuppressWarnings({"ReturnCount", "MagicNumber"})
     public Fraction(@NonNull final String fraction) {
         if (fraction.contains("/")) {
             final var split = fraction.split("/");
             if (split.length != 2 || new BigInteger("0").equals(new BigInteger(split[1]))) {
                 throw new IllegalArgumentException();
             }
-            numerator = new BigInteger(split[0]);
-            denominator = new BigInteger(split[1]);
+            final var simplified = simplify(new BigInteger(split[0]), new BigInteger(split[1]));
+            numerator = simplified.getValue0();
+            denominator = simplified.getValue1();
+            return;
+        }
+        if (fraction.contains(".")) {
+            final var split = fraction.split("\\.");
+            if (split.length != 2) {
+                throw new IllegalArgumentException();
+            }
+            final var num = new BigInteger(fraction.replace(".", ""));
+            final var denom = BigDecimal.valueOf(Math.pow(10, split[1].length())).toBigInteger();
+            final var simplified = simplify(num, denom);
+            numerator = simplified.getValue0();
+            denominator = simplified.getValue1();
             return;
         }
         numerator = new BigInteger(fraction);

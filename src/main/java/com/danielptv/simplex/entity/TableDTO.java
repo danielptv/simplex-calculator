@@ -33,11 +33,6 @@ public class TableDTO<T extends CalculableImpl<T>> {
      */
     @Getter
     private final int constraintCount;
-    /**
-     * RegEx pattern for a Fraction or RoundedDecimal.
-     */
-    @Getter
-    private final String pattern;
 
     /**
      * Constructor for a TableDTO.
@@ -45,13 +40,11 @@ public class TableDTO<T extends CalculableImpl<T>> {
      * @param inst            Fraction or RoundedDecimal.
      * @param variablesCount  Number of variables.
      * @param constraintCount Number of constraints.
-     * @param pattern         RegEx pattern for Fraction or RoundedDecimal.
      */
-    public TableDTO(final T inst, final int variablesCount, final int constraintCount, @NonNull final String pattern) {
+    public TableDTO(final T inst, final int variablesCount, final int constraintCount) {
         this.inst = inst;
         this.variablesCount = variablesCount;
         this.constraintCount = constraintCount;
-        this.pattern = pattern;
     }
 
     /**
@@ -60,13 +53,12 @@ public class TableDTO<T extends CalculableImpl<T>> {
      * @param inst            Fraction or RoundedDecimal.
      * @param variablesCount  Number of variables.
      * @param constraintCount Number of constraints.
-     * @param pattern         RegEx pattern for Fraction or RoundedDecimal.
      * @param table           ArrayList-Representation of the Simplex-Table.
      */
     public TableDTO(final T inst, final int variablesCount,
                     final int constraintCount,
-                    @NonNull final String pattern, @NonNull final List<List<String>> table) {
-        this(inst, variablesCount, constraintCount, pattern);
+                    @NonNull final List<List<String>> table) {
+        this(inst, variablesCount, constraintCount);
         this.table = table;
     }
 
