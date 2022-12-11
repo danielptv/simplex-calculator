@@ -169,7 +169,7 @@ public final class InputUtils {
                                               @NonNull final String regEx) {
         final var scan = new Scanner(System.in);
         final var pattern1 = "^" + regEx + ("," + regEx).repeat(varCount) + "$";
-        final var pattern2 = "^" + regEx + ("," + regEx).repeat(varCount - 1) + "[<>]" + regEx + "$";
+        final var pattern2 = "^" + regEx + ("," + regEx).repeat(varCount - 1) + "[<>=]" + regEx + "$";
         final var result = new ArrayList<List<String>>();
 
         for (int i = 1; i < restrictCount + 1; ++i) {
@@ -188,8 +188,12 @@ public final class InputUtils {
                     break;
                 }
                 if (in.matches(pattern2)) {
-                    final var sign = in.contains(">") ? ">" : "<";
-                    final var newIn = in.contains(">") ? in.replace(">", ",") : in.replace("<", ",");
+                    final var sign = in.contains(">") ? ">" : in.contains("<") ? "<" : "=";
+                    final var newIn = in.contains(">")
+                                    ? in.replace(">", ",")
+                                    : in.contains("<")
+                                    ? in.replace("<", ",")
+                                    : in.replace("=", ",");
                     final var restriction = new ArrayList<>(Arrays.stream(newIn.split(",")).toList());
                     restriction.add(sign);
                     result.add(restriction);

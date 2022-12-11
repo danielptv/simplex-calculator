@@ -135,7 +135,9 @@ public final class TableBuildService {
     @SuppressWarnings({"MagicNumber", "CyclomaticComplexity"})
     static <T extends CalculableImpl<T>> ArrayList<ArrayList<T>> buildTable(@NonNull final TableDTO<T> tableDTO) {
         final var inst = tableDTO.getInst();
+        final var minusOne = inst.create("-1");
         final var input = tableDTO.getTable();
+
         // create rows
         final var table = new ArrayList<>(input.stream()
                 .map(x -> new ArrayList<T>())
@@ -150,20 +152,24 @@ public final class TableBuildService {
 
         // feed values
         for (int row = 0; row < input.size(); ++row) {
+
+            final var relationSign = input.get(row).get(input.get(row).size() - 1);
+
             for (int column = 0; column < input.get(1).size() - 2; ++column) {
-                // target function values
+                // objective function values
+                final var currentVal = input.get(row).get(column);
                 if (row == 0) {
-                    table.get(0).set(column, inst.create(input.get(0).get(column)).multiply(inst.create("-1")));
-                } else if (input.get(row).get(input.get(row).size() - 1).equals(">")) {
-                    table.get(row).set(column, inst.create(input.get(row).get(column)).multiply(inst.create("-1")));
+                    table.get(0).set(column, inst.create(input.get(0).get(column)).multiply(minusOne));
+                } else if (relationSign.equals(">") || relationSign.equals("=")) {
+                    table.get(row).set(column, inst.create(currentVal).multiply(minusOne));
                 } else {
-                    table.get(row).set(column, inst.create(input.get(row).get(column)));
+                    table.get(row).set(column, inst.create(currentVal));
                 }
             }
 
             // unit matrix
             for (int i = input.get(0).size() - 2; i < input.get(0).size() + input.size() - 1; ++i) {
-                if (row == i - input.get(0).size() + 3) {
+                if (row == i - input.get(0).size() + 3 && !relationSign.equals("=")) {
                     table.get(row).set(i, inst.create("1"));
                 }
             }
@@ -173,7 +179,7 @@ public final class TableBuildService {
             if (row == 0) {
                 rHS = inst.create("0");
             }
-            if (input.get(row).get(input.get(row).size() - 1).equals(">")) {
+            if (relationSign.equals(">") || relationSign.equals("=")) {
                 rHS = rHS.multiply(inst.create("-1"));
             }
             table.get(row).set(table.get(row).size() - 1, rHS);
