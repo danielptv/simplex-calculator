@@ -132,7 +132,7 @@ public final class TableBuildService {
      * @param <T>      Fraction or RoundedDecimal.
      * @return The Simplex-Table as ArrayList.
      */
-    @SuppressWarnings({"MagicNumber", "CyclomaticComplexity"})
+    @SuppressWarnings({"MagicNumber", "CyclomaticComplexity", "NPathComplexity"})
     static <T extends CalculableImpl<T>> ArrayList<ArrayList<T>> buildTable(@NonNull final TableDTO<T> tableDTO) {
         final var inst = tableDTO.getInst();
         final var minusOne = inst.create("-1");

@@ -192,7 +192,8 @@ public final class OutputUtils {
                         : input.get(x).get(y);
 
                 if (y == pos - 2) {
-                    sb.append(input.get(x).get(pos - 1).equals(">") ? " >= " : " <= ");
+                    final var relationSign = input.get(x).get(pos - 1);
+                    sb.append(relationSign.equals(">") ? " >= " : relationSign.equals("<") ? " <= " : " = ");
                     sb.append(number);
                 } else if (y == pos - 3) {
                     sb.append(number).append("*x").append(y + 1);
