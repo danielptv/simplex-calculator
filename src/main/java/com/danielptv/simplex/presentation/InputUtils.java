@@ -33,15 +33,15 @@ public final class InputUtils {
      */
     static <T extends CalculableImpl<T>> @NonNull TableDTO<T> parseInput(@NonNull final TableDTO<T> tableDTO) {
 
-        final var varCount = tableDTO.getVariablesCount();
-        final var restrictCount = tableDTO.getConstraintCount();
+        final var varCount = tableDTO.variablesCount();
+        final var restrictCount = tableDTO.constraintCount();
         final var input = new ArrayList<List<String>>();
 
         out.println();
         input.add(getObjectiveFunc(varCount));
         input.addAll(getRestrictions(varCount, restrictCount));
 
-        return new TableDTO<>(tableDTO.getInst(), varCount, restrictCount, input);
+        return new TableDTO<>(tableDTO.inst(), input, varCount, restrictCount);
     }
 
     /**

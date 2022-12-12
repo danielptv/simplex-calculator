@@ -30,7 +30,7 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
      * @param c Fraction or RoundedDecimal.
      * @return Fraction or RoundedDecimal.
      */
-    T addUp(T c);
+    T add(T c);
 
     /**
      * Method for creating new Fraction or RoundedDecimal from an existing one.

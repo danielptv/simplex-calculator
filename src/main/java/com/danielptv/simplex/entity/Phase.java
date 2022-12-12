@@ -14,16 +14,19 @@ import static com.danielptv.simplex.presentation.OutputUtils.STYLE_RESET;
 
 /**
  * Entity-Class representing a phase of the Two-Phase-Simplex Method.
+ *
+ * @param <T> Fraction or RoundedDecimal
  */
-public class Phase {
+public class Phase<T extends CalculableImpl<T>> {
     @Getter
-    private final List<Table<?>> tables;
+    @NonNull
+    private final List<Table<T>> tables;
     @NonNull
     @Getter
     private final String title;
     @Getter
     @Setter
-    private boolean solvable = true;
+    private NoSolutionType noSolutionType;
 
     /**
      * Constructor for a Phase.
@@ -40,8 +43,17 @@ public class Phase {
      *
      * @param table The table.
      */
-    public void addTable(@NonNull final Table<?> table) {
+    public void addTable(@NonNull final Table<T> table) {
         tables.add(table);
+    }
+
+    /**
+     * Method for getting the last table of the phase.
+     *
+     * @return The last table.
+     */
+    public Table<T> getLastTable() {
+        return tables.get(tables.size() - 1);
     }
 
     @Override

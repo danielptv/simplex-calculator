@@ -103,7 +103,7 @@ final class TableCalcService {
      * @param <T>         Fraction or RoundedDecimal.
      * @return The index of the pivot row.
      */
-    static <T extends CalculableImpl<T>> int getPivotRow(@NonNull final List<Row<T>> lHS,
+    static <T extends CalculableImpl<T>> Integer getPivotRow(@NonNull final List<Row<T>> lHS,
                                                          @NonNull final List<T> rHS, final boolean isExtended,
                                                          final int pivotColumn, @NonNull final T inst) {
         final var pivots = IntStream.range(0, rHS.size())
@@ -118,6 +118,7 @@ final class TableCalcService {
                     return rHS.get(i).divide(divisor);
                 })
                 .toList();
+
         return pivots.indexOf(Collections.min(pivots));
     }
 

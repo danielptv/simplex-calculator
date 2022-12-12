@@ -1,5 +1,6 @@
 package com.danielptv.simplex.presentation;
 
+import com.danielptv.simplex.entity.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
 import com.danielptv.simplex.entity.Table;
 import com.danielptv.simplex.entity.TableDTO;
@@ -110,11 +111,7 @@ public final class OutputUtils {
      */
     @SuppressWarnings("ReturnCount")
     public static void accentuatePivot(@NonNull final Table<?> table) {
-        if (table.getPivot() == null) {
-            return;
-        }
-
-        table.getLHS().get(table.getPivot().row()).setPivotPos(table.getPivot().column());
+        table.lHS().get(table.pivot().row()).setPivotPos(table.pivot().column());
     }
 
     /**
@@ -127,13 +124,13 @@ public final class OutputUtils {
     public static StringBuilder printTable(@NonNull final Table<?> table) {
         setMaxEntryWidths(table);
 
-        final var lHS = table.getLHS();
-        final var extendedLHS = table.getExtendedLHS();
-        final var rHS = table.getRHS();
+        final var lHS = table.lHS();
+        final var extendedLHS = table.extendedLHS();
+        final var rHS = table.rHS();
 
         final var rHSWidth = getRhsWidth(rHS);
         final var entryWidths = new ArrayList<>(lHS.get(0).getEntryWidths());
-        if (table.getExtendedLHS() != null) {
+        if (table.extendedLHS() != null) {
             entryWidths.addAll(extendedLHS.get(0).getEntryWidths());
         }
         entryWidths.add(rHSWidth);
@@ -147,8 +144,8 @@ public final class OutputUtils {
         final var sb = new StringBuilder();
         sb.append("  ").append("+").append("-".repeat(totalWidth - 6)).append(String.format("+%n"));
         sb.append("  | ");
-        sb.append(table.getTitle());
-        sb.append(" ".repeat(totalWidth - table.getTitle().length() - 7));
+        sb.append(table.title());
+        sb.append(" ".repeat(totalWidth - table.title().length() - 7));
         sb.append(String.format("|%n"));
         sb.append(line);
 
@@ -166,8 +163,8 @@ public final class OutputUtils {
     @SuppressWarnings({"LambdaBodyLength", "MagicNumber"})
     public static StringBuilder printTableDTO(@NonNull final TableDTO<?> tableDTO) {
         final var sb = new StringBuilder();
-        @NonNull final var input = tableDTO.getTable();
-        final var restrictCount = tableDTO.getConstraintCount();
+        @NonNull final var input = tableDTO.table();
+        final var restrictCount = tableDTO.constraintCount();
 
         sb.append(String.format("%n")).append(FONT_GREEN).append(String.format("  INPUT:%n"));
         sb.append("  ZF: max ");
@@ -211,29 +208,28 @@ public final class OutputUtils {
      * Method for printing the final result of a Simplex-Phase.
      *
      * @param phase A Simplex-Phase.
+     * @param <T> Fraction or RoundedDecimal
      * @return The final result as StringBuilder.
      */
     @SuppressWarnings("MagicNumber")
-    static StringBuilder printPhaseResult(@NonNull final Phase phase) {
+    static <T extends CalculableImpl<T>> StringBuilder printPhaseResult(@NonNull final Phase<T> phase) {
         final var sb = new StringBuilder();
         final var table = phase.getTables().get(phase.getTables().size() - 1);
 
-        if (!phase.isSolvable()) {
+        if (phase.getNoSolutionType() != null) {
             sb.append(FONT_RED);
-            sb.append(String.format("  The problem has no solution (infeasible).%n"));
-            sb.append("  The iterations of the first phase have been completed and there are artificial variables in " +
-                    "the base with values strictly greater than 0.");
+            sb.append(phase.getNoSolutionType());
             sb.append(STYLE_RESET);
             return sb;
         }
 
         sb.append(FONT_GREEN);
         sb.append(String.format("  OUTPUT:%n"));
-        sb.append("  f(x) = ").append(table.getRHS().get(0).toDecimal().toPlainString()).append(String.format("%n"));
-        final var variables = table.getColumnHeaders().stream()
+        sb.append("  f(x) = ").append(table.rHS().get(0).toDecimal().toPlainString()).append(String.format("%n"));
+        final var variables = table.columnHeaders().stream()
                 .filter(e -> e.contains("x"))
                 .toList();
-        final var newRowHeaders = table.getRowHeaders().stream()
+        final var newRowHeaders = table.rowHeaders().stream()
                 .map(e -> {
                     if (e.length() == "x1[1]".length()) {
                         return e.substring(0, e.length() - 3);
@@ -246,7 +242,7 @@ public final class OutputUtils {
             sb.append("  ").append(e).append(" = ");
             if (newRowHeaders.contains(e)) {
                 final var index = newRowHeaders.indexOf(e);
-                sb.append(table.getRHS().get(index)).append(String.format("%n"));
+                sb.append(table.rHS().get(index)).append(String.format("%n"));
             } else {
                 sb.append(String.format("0%n"));
             }
@@ -267,11 +263,11 @@ public final class OutputUtils {
     static StringBuilder printBody(@NonNull final Table<?> table,
                                    @NonNull final StringBuilder line,
                                    @NonNull final List<Integer> entryWidths) {
-        final var lHS = table.getLHS();
-        final var extendedLHS = table.getExtendedLHS();
-        final var rHS = table.getRHS();
-        final var rowHeaders = table.getRowHeaders();
-        final var columnHeaders = table.getColumnHeaders();
+        final var lHS = table.lHS();
+        final var extendedLHS = table.extendedLHS();
+        final var rHS = table.rHS();
+        final var rowHeaders = table.rowHeaders();
+        final var columnHeaders = table.columnHeaders();
         final var sb = new StringBuilder();
 
         sb.append("  | J      ");
@@ -320,9 +316,9 @@ public final class OutputUtils {
      */
     static void setMaxEntryWidths(@NonNull final Table<?> table) {
         final var maxEntryWidths = new ArrayList<Integer>();
-        for (int i = 0; i < table.getLHS().get(0).getEntries().size(); ++i) {
+        for (int i = 0; i < table.lHS().get(0).getEntries().size(); ++i) {
             final var finalI = i;
-            final var maxWidth = Collections.max(table.getLHS().stream()
+            final var maxWidth = Collections.max(table.lHS().stream()
                     .map(e -> {
                         e.setEntryWidths();
                         return e.getEntryWidths().get(finalI);
@@ -330,13 +326,13 @@ public final class OutputUtils {
                     .toList());
             maxEntryWidths.add(maxWidth);
         }
-        table.getLHS().forEach(e -> e.setEntryWidths(maxEntryWidths));
+        table.lHS().forEach(e -> e.setEntryWidths(maxEntryWidths));
 
-        if (table.getExtendedLHS() != null) {
+        if (table.extendedLHS() != null) {
             final var extensionMaxEntryWidths = new ArrayList<Integer>();
-            for (int i = 0; i < table.getExtensionSize(); ++i) {
+            for (int i = 0; i < table.extensionSize(); ++i) {
                 final var finalI = i;
-                final var maxWidth = Collections.max(table.getExtendedLHS().stream()
+                final var maxWidth = Collections.max(table.extendedLHS().stream()
                         .map(e -> {
                             e.setEntryWidths();
                             return e.getEntryWidths().get(finalI);
@@ -344,7 +340,7 @@ public final class OutputUtils {
                         .toList());
                 extensionMaxEntryWidths.add(maxWidth);
             }
-            table.getExtendedLHS().forEach(e -> e.setEntryWidths(extensionMaxEntryWidths));
+            table.extendedLHS().forEach(e -> e.setEntryWidths(extensionMaxEntryWidths));
         }
     }
 

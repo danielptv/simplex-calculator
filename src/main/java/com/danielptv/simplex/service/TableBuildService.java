@@ -31,13 +31,13 @@ public final class TableBuildService {
      */
     public static <T extends CalculableImpl<T>> Table<T> build(@NonNull final TableDTO<T> tableDTO) {
 
-        if (tableDTO.getTable() == null) {
+        if (tableDTO.table() == null) {
             throw new IllegalArgumentException();
         }
-        final var inst = tableDTO.getInst();
+        final var inst = tableDTO.inst();
         final var table = buildTable(tableDTO);
-        final var varCount = tableDTO.getVariablesCount();
-        final var constraintCount = tableDTO.getConstraintCount();
+        final var varCount = tableDTO.variablesCount();
+        final var constraintCount = tableDTO.constraintCount();
         final var rHS = buildRHS(new ArrayList<>(table));
         final var lHS = buildLHS(new ArrayList<>(table), inst);
         final var columnHeaders = buildColumnHeaders(varCount, constraintCount);
@@ -134,9 +134,9 @@ public final class TableBuildService {
      */
     @SuppressWarnings({"MagicNumber", "CyclomaticComplexity", "NPathComplexity"})
     static <T extends CalculableImpl<T>> ArrayList<ArrayList<T>> buildTable(@NonNull final TableDTO<T> tableDTO) {
-        final var inst = tableDTO.getInst();
+        final var inst = tableDTO.inst();
         final var minusOne = inst.create("-1");
-        final var input = tableDTO.getTable();
+        final var input = tableDTO.table();
 
         // create rows
         final var table = new ArrayList<>(input.stream()

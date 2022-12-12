@@ -30,34 +30,35 @@ final class TableExtensionService {
      */
     static <T extends CalculableImpl<T>> Table<T> buildExtension(
             @NonNull final Table<T> table) {
-        if (table.getExtendedLHS() != null) {
+        if (table.extendedLHS() != null) {
             throw new UnsupportedOperationException("Table is already extended!");
         }
 
-        final var inst = table.getInst();
-        final var negativeRows = getNegativeRows(table.getRHS(), inst);
-        var lHS = invertNegativeRowsLHS(table.getLHS(), negativeRows);
-        var rHS = invertNegativeRowsRHS(table.getRHS(), negativeRows, inst);
+        final var inst = table.inst();
+        final var negativeRows = getNegativeRows(table.rHS(), inst);
+        var lHS = invertNegativeRowsLHS(table.lHS(), negativeRows);
+        var rHS = invertNegativeRowsRHS(table.rHS(), negativeRows, inst);
         lHS = addCriterionLineLHS(lHS, inst);
         rHS = addCriterionLineRHS(rHS, inst);
         final var extendedLHS = addExtensionColumns(inst, negativeRows, rHS.size());
         final var extensionSize = negativeRows.size();
 
-        final var columnHeaders = new ArrayList<>(table.getColumnHeaders());
+        final var columnHeaders = new ArrayList<>(table.columnHeaders());
         IntStream.range(1, extensionSize + 1)
                 .forEach(i -> {
                     final var size = columnHeaders.size();
                     columnHeaders.add(size - 1, "h" + i);
                 });
-        final var rowHeaders = new ArrayList<>(table.getRowHeaders());
+        final var rowHeaders = new ArrayList<>(table.rowHeaders());
         rowHeaders.add(0, "z'");
 
         final var pivot = setPivot(lHS, rHS, extendedLHS, inst);
 
         return new Table<>(
                 inst,
-                table.getTitle(),
-                lHS, extendedLHS,
+                table.title(),
+                lHS,
+                extendedLHS,
                 rHS,
                 pivot,
                 columnHeaders,
@@ -75,26 +76,26 @@ final class TableExtensionService {
      */
     static <T extends CalculableImpl<T>> Table<T> removeExtension(
             @NonNull final Table<T> table) {
-        if (table.getExtendedLHS() == null) {
+        if (table.extendedLHS() == null) {
             throw new UnsupportedOperationException("Table is not extended!");
         }
 
-        final var inst = table.getInst();
-        final var lHS = new ArrayList<>(table.getLHS());
+        final var inst = table.inst();
+        final var lHS = new ArrayList<>(table.lHS());
         lHS.remove(0);
-        final var rHS = new ArrayList<>(table.getRHS());
+        final var rHS = new ArrayList<>(table.rHS());
         rHS.remove(0);
         final var pivot = setPivot(lHS, rHS, null, inst);
 
-        final var columnHeaders = new ArrayList<>(table.getColumnHeaders());
-        IntStream.range(0, table.getExtensionSize())
+        final var columnHeaders = new ArrayList<>(table.columnHeaders());
+        IntStream.range(0, table.extensionSize())
                 .forEach(i -> {
                     final var size = columnHeaders.size();
                     columnHeaders.remove(size - 2);
                 });
-        final var rowHeaders = new ArrayList<>(table.getRowHeaders());
+        final var rowHeaders = new ArrayList<>(table.rowHeaders());
         rowHeaders.remove(0);
-        return new Table<>(inst, table.getTitle(), lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
+        return new Table<>(inst, table.title(), lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
     }
 
     /**

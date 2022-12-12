@@ -8,9 +8,10 @@ import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
+import static com.danielptv.simplex.entity.NoSolutionType.INFEASIBLE;
+import static com.danielptv.simplex.entity.NoSolutionType.UNBOUNDED;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_1;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_2;
 import static com.danielptv.simplex.presentation.OutputUtils.SIMPLEX_HEADLINE;
@@ -38,57 +39,95 @@ public final class TwoPhaseSimplex {
      * @param <T>          Fraction or RoundedDecimal.
      * @return A List containing the resulting Simplex-Phases.
      */
-    @SuppressWarnings("ExecutableStatementCount")
-    public static <T extends CalculableImpl<T>> List<Phase> calc(@NonNull final Table<T> simplexTable) {
-        Phase phase = null;
-        final var inst = simplexTable.getInst();
-        final var result = new ArrayList<Phase>();
-        var count = 1;
-
+    public static <T extends CalculableImpl<T>> List<Phase<T>> calc(@NonNull final Table<T> simplexTable) {
+        final var result = new ArrayList<Phase<T>>(2);
         var table = simplexTable;
-        if (!isSimplexAcceptable(table.getRHS(), false, inst)) {
-            phase = new Phase(PHASE_1);
-            table = buildExtension(table);
 
-            table = transformToCanonical(table);
-            phase.addTable(new Table<>(table, "INITIAL TABLE"));
-
-            var isSimplexAcceptable = isSimplexAcceptable(table.getRHS(), true, inst);
-            while (!isSimplexAcceptable) {
-                table = transform(table);
-                phase.addTable(new Table<>(table, "ITERATION " + count));
-                count++;
-                isSimplexAcceptable = isSimplexAcceptable(table.getRHS(), true, inst);
-
-                if (isOptimal(table.getLHS(), table.getExtendedLHS()) &&
-                        !table.getRHS().get(0).equals(inst.create("0"))) {
-                    phase.setSolvable(false);
-                    result.add(phase);
-                    return result;
-                }
-            }
-            table = removeExtension(table);
-        }
-
-        final Phase phase2;
-        if (phase != null) {
+        // optional phase 1
+        if (!isSimplexAcceptable(table.rHS(), false, table.inst())) {
+            final var phase = phase1(table);
             result.add(phase);
-            phase2 = new Phase(PHASE_2);
-        } else {
-            phase2 = new Phase(SIMPLEX_HEADLINE);
-        }
-        phase2.addTable(new Table<>(table, "INITIAL TABLE"));
-        count = 1;
 
-        var isOptimal = isOptimal(table.getLHS(), table.getExtendedLHS());
+            if (phase.getNoSolutionType() != null) {
+                return result;
+            }
+
+            table = removeExtension(phase.getLastTable());
+        }
+
+        // primary simplex algorithm
+        final var headline = result.isEmpty() ? SIMPLEX_HEADLINE : PHASE_2;
+        result.add(phase2(table, headline));
+        return result;
+    }
+
+    /**
+     * Method for the first phase of the 2-Phase-Simplex method.
+     *
+     * @param simplexTable The initial simplex table.
+     * @param <T>          Fraction or RoundedDecimal.
+     * @return A Phase containing all intermediary tables.
+     */
+    static <T extends CalculableImpl<T>> Phase<T> phase1(@NonNull final Table<T> simplexTable) {
+        final var phase = new Phase<T>(PHASE_1);
+        final var inst = simplexTable.inst();
+
+        // add helper columns
+        var table = buildExtension(simplexTable);
+
+        // transform table to its canonical form
+        table = transformToCanonical(table);
+        phase.addTable(new Table<>(table, "INITIAL TABLE"));
+
+        // transform table until acceptable for primary simplex
+        var count = 1;
+        var isSimplexAcceptable = isSimplexAcceptable(table.rHS(), true, inst);
+        while (!isSimplexAcceptable) {
+            table = transform(table);
+            phase.addTable(new Table<>(table, "ITERATION " + count));
+            isSimplexAcceptable = isSimplexAcceptable(table.rHS(), true, inst);
+            count++;
+
+            if (isOptimal(table.lHS(), table.extendedLHS()) && !table.rHS().get(0).equals(inst.create("0"))) {
+                phase.setNoSolutionType(INFEASIBLE);
+                return phase;
+            }
+        }
+        return phase;
+    }
+
+    /**
+     * Method for the primary simplex.
+     *
+     * @param simplexTable The initial simplex table.
+     * @param headline     The headline for the phase.
+     * @param <T>          Fraction or RoundedDecimal.
+     * @return A Phase containing all intermediary tables.
+     */
+    static <T extends CalculableImpl<T>> Phase<T> phase2(@NonNull final Table<T> simplexTable,
+                                                         @NonNull final String headline) {
+        final var phase = new Phase<T>(headline);
+        final var inst = simplexTable.inst();
+        var table = simplexTable;
+        phase.addTable(new Table<>(table, "INITIAL TABLE"));
+
+        // transform the table until an optimal solution is found
+        var count = 1;
+        var isOptimal = isOptimal(table.lHS(), table.extendedLHS());
         while (!isOptimal) {
             table = transform(table);
-            phase2.addTable(new Table<>(table, "ITERATION " + count));
-            isOptimal = isOptimal(table.getLHS(), table.getExtendedLHS());
+            phase.addTable(new Table<>(table, "ITERATION " + count));
+
+            final var pivotElement = table.lHS().get(table.pivot().row()).getElementByIndex(table.pivot().column());
+            if (pivotElement.compareTo(inst.create("0")) < 0) {
+                phase.setNoSolutionType(UNBOUNDED);
+                return phase;
+            }
+
+            isOptimal = isOptimal(table.lHS(), table.extendedLHS());
             count++;
         }
-        result.add(phase2);
-        return result;
+        return phase;
     }
 
     /**
@@ -101,26 +140,23 @@ public final class TwoPhaseSimplex {
     @SuppressWarnings("LambdaBodyLength")
     public static <T extends CalculableImpl<T>> @NonNull Table<T> transform(
             @NonNull final Table<T> table) {
-        final var inst = table.getInst();
-        final var rowCount = table.getRHS().size();
-        final var columnHeaders = table.getColumnHeaders();
-        final var pivot = table.getPivot();
+        final var inst = table.inst();
+        final var rowCount = table.rHS().size();
+        final var columnHeaders = table.columnHeaders();
+        final var pivot = table.pivot();
 
-        if (pivot == null) {
-            throw new IllegalArgumentException();
-        }
-        var rowHeaders = table.getRowHeaders();
-        rowHeaders = updateRowHeaders(columnHeaders, table.getRowHeaders(), pivot);
+        var rowHeaders = table.rowHeaders();
+        rowHeaders = updateRowHeaders(columnHeaders, table.rowHeaders(), pivot);
 
         // find divisor and divide
-        final var divisor = getPivotElement(pivot, table.getLHS());
-        final var lHS = new ArrayList<>(table.getLHS());
+        final var divisor = getPivotElement(pivot, table.lHS());
+        final var lHS = new ArrayList<>(table.lHS());
         lHS.set(pivot.row(), lHS.get(pivot.row()).divideRow(divisor));
-        var extendedLHS = table.getExtendedLHS();
+        var extendedLHS = table.extendedLHS();
 
-        final var rHS = new ArrayList<>(table.getRHS());
+        final var rHS = new ArrayList<>(table.rHS());
         rHS.set(pivot.row(), rHS.get(pivot.row()).divide(divisor));
-        if (table.getExtendedLHS() != null) {
+        if (table.extendedLHS() != null) {
             extendedLHS = new ArrayList<>(extendedLHS);
             extendedLHS.set(pivot.row(), extendedLHS.get(pivot.row()).divideRow(divisor));
         }
@@ -133,7 +169,7 @@ public final class TwoPhaseSimplex {
 
         //iterate
         final List<T> finalFactors = factors;
-        if (table.getExtendedLHS() != null) {
+        if (table.extendedLHS() != null) {
             extendedLHS = new ArrayList<>(extendedLHS);
         }
         final var finalExtendedLHS = extendedLHS;
@@ -144,17 +180,17 @@ public final class TwoPhaseSimplex {
                         var currRow = new Row<>(lHS.get(row));
 
                         lHS.set(row, pivotTemp.multiplyRow(pivotTemp, finalFactors.get(row)));
-                        lHS.set(row, lHS.get(row).addUpRow(currRow));
+                        lHS.set(row, lHS.get(row).addRow(currRow));
 
-                        if (table.getExtendedLHS() != null) {
+                        if (table.extendedLHS() != null) {
                             pivotTemp = new Row<>(finalExtendedLHS.get(pivot.row()));
                             currRow = new Row<>(finalExtendedLHS.get(row));
 
                             finalExtendedLHS.set(row, pivotTemp.multiplyRow(pivotTemp, finalFactors.get(row)));
-                            finalExtendedLHS.set(row, finalExtendedLHS.get(row).addUpRow(currRow));
+                            finalExtendedLHS.set(row, finalExtendedLHS.get(row).addRow(currRow));
                         }
-                        final var currVal = table.getRHS().get(row);
-                        rHS.set(row, rHS.get(pivot.row()).multiply(finalFactors.get(row)).addUp(currVal));
+                        final var currVal = table.rHS().get(row);
+                        rHS.set(row, rHS.get(pivot.row()).multiply(finalFactors.get(row)).add(currVal));
                     }
                 });
 
@@ -166,14 +202,14 @@ public final class TwoPhaseSimplex {
 
         return new Table<>(
                 inst,
-                table.getTitle(),
+                table.title(),
                 lHS,
                 finalExtendedLHS,
                 rHS,
                 newPivot,
                 columnHeaders,
                 rowHeaders,
-                table.getExtensionSize());
+                table.extensionSize());
     }
 
     /**
@@ -186,46 +222,37 @@ public final class TwoPhaseSimplex {
     public static <T extends CalculableImpl<T>> @NonNull Table<T> transformToCanonical(
             @NonNull final Table<T> table) {
 
-        if (table.getExtendedLHS() == null) {
+        if (table.extendedLHS() == null) {
             throw new IllegalArgumentException();
         }
 
-        final var inst = table.getInst();
-        final var extensionSize = table.getExtensionSize();
-        final var lHs = new ArrayList<>(table.getLHS());
-        final var extendedLHS = new ArrayList<>(table.getExtendedLHS());
-        final var rHS = new ArrayList<>(table.getRHS());
+        final var inst = table.inst();
+        final var extensionSize = table.extensionSize();
+        final var lHs = new ArrayList<>(table.lHS());
+        final var extendedLHS = new ArrayList<>(table.extendedLHS());
+        final var rHS = new ArrayList<>(table.rHS());
+        final var rowHeaders = table.rowHeaders();
 
-        for (int i = 0; i < extensionSize; ++i) {
-
-            final var finalI = i;
-            final var optionalInt = IntStream.range(2, rHS.size())
-                    .filter(e -> Objects.equals(extendedLHS.get(e).getEntries().get(finalI), inst.create("1")))
-                    .findFirst();
-            if (optionalInt.isEmpty()) {
-                throw new UnsupportedOperationException();
-            }
-            final var row = optionalInt.getAsInt();
-
-            final var newRowLeft = lHs.get(row).invertRow().addUpRow(lHs.get(0));
-            lHs.set(0, newRowLeft);
-            final var newRowExt = extendedLHS.get(row).invertRow().addUpRow(extendedLHS.get(0));
-            extendedLHS.set(0, newRowExt);
-            final var newValRHS = rHS.get(row).multiply(inst.create("-1")).addUp(rHS.get(0));
-            rHS.set(0, newValRHS);
-        }
+        IntStream.range(0, rowHeaders.size())
+                .forEach(i -> {
+                    if (rowHeaders.get(i).contains("h")) {
+                        lHs.set(0, lHs.get(0).addRow(lHs.get(i).invertRow()));
+                        extendedLHS.set(0, extendedLHS.get(0).addRow(extendedLHS.get(i).invertRow()));
+                        rHS.set(0, rHS.get(0).add(rHS.get(i).multiply(inst.create("-1"))));
+                    }
+                });
 
         final var pivot = setPivot(lHs, rHS, extendedLHS, inst);
-
         return new Table<>(
                 inst,
-                table.getTitle(),
+                table.title(),
                 lHs,
                 extendedLHS,
                 rHS,
                 pivot,
-                table.getColumnHeaders(),
-                table.getRowHeaders(),
-                extensionSize);
+                table.columnHeaders(),
+                rowHeaders,
+                extensionSize
+        );
     }
 }

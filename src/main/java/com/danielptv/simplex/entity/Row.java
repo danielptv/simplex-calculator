@@ -88,7 +88,7 @@ public class Row<T extends CalculableImpl<T>> {
     public Row<T> divideRow(@NonNull final T divisor) {
         return new Row<>(entries.stream()
                 .map(e -> {
-                    if (divisor.compareTo(inst.create("0")) == 0) {
+                    if (divisor.equals(inst.create("0"))) {
                         return e;
                     }
                     return e.divide(divisor);
@@ -102,13 +102,13 @@ public class Row<T extends CalculableImpl<T>> {
      * @param addends A Row.
      * @return The resulting Row.
      */
-    public Row<T> addUpRow(@NonNull final Row<T> addends) {
+    public Row<T> addRow(@NonNull final Row<T> addends) {
         if (addends.entries.size() != entries.size()) {
             throw new IllegalArgumentException();
         }
 
         return new Row<>(IntStream.range(0, addends.entries.size())
-                .mapToObj(e -> entries.get(e).addUp(addends.entries.get(e)))
+                .mapToObj(e -> entries.get(e).add(addends.entries.get(e)))
                 .toList(), inst);
     }
 

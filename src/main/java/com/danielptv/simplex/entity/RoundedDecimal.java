@@ -137,7 +137,7 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
      * @return The result.
      */
     @Override
-    public RoundedDecimal addUp(@NonNull final RoundedDecimal d) {
+    public RoundedDecimal add(@NonNull final RoundedDecimal d) {
         return new RoundedDecimal(value.add(d.value), d.mantissaLength);
     }
 

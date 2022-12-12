@@ -69,7 +69,7 @@ public class Fraction implements CalculableImpl<Fraction> {
      * @param denom String representation of the denominator.
      */
     public Fraction(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
-        if (denom.compareTo(new BigInteger("0")) == 0) {
+        if (denom.equals(new BigInteger("0"))) {
             throw new ArithmeticException();
         }
         final var simplified = simplify(num, denom);
@@ -106,7 +106,7 @@ public class Fraction implements CalculableImpl<Fraction> {
      * @return The added Fraction.
      */
     @Override
-    public Fraction addUp(@NonNull final Fraction f) {
+    public Fraction add(@NonNull final Fraction f) {
         final var num = (numerator.multiply(f.denominator)).add(f.numerator.multiply(denominator));
         return new Fraction(num, denominator.multiply(f.denominator));
     }
