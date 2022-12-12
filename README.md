@@ -2,7 +2,7 @@
 
 Simplex Calculator is a Java console app for solving linear programming problems. The traditional simplex method is used and the two-phase method where applicable. This program primarily serves educational purposes.
 * **Optimal solution** to **any linear problem** if a solution does exist.
-* **Feasibility check** meaning problems without solution will be detected.
+* Detection for **infeasible** and **unbounded** problems.
 * Two calculation modes: **Exact** and **Rounded**.
 * **Intermediate tableaus** are shown and the **pivot element** is highlighted for each iteration. This way you can check the results you obtained when solving the problem manually.
 
@@ -21,8 +21,7 @@ For a video demo see [Simplex Calculator](https://drive.google.com/drive/folders
 * **Rounded**: Calculation with decimals rounded to a certain mantissa using optimal rounding and "round half to even". Rounding takes place after each step of the calculation.
 
 ## Number Input
-* **Fractions:** Input as fraction or integer, e.g. *'123/321'* or *'123'*.
-* **Decimal numbers:** Input as decimal number or integer, e.g. *'123.4'* or *'123'*.
+Numbers can be entered as integer, fraction or decimal number, e.g. *'123'*, *'123/321'* or *'123.321'*.
 
 ## Usage
 
@@ -34,7 +33,7 @@ For a video demo see [Simplex Calculator](https://drive.google.com/drive/folders
 
 **2. Enter your linear problem:**
    * Enter your objective function, e.g. *'6,4'* which will equal *'max f(x) = 6\*x1 + 4\*x2'*.
-   * Enter your constraints and put a relation sign before each restraint value, e.g. *'2,3>1200'* which will equal *'2\*x1 + 3\*x2 >= 1200'*. Supported relation signs are *'<'* and *'>'*. Instead of *'<'* you may also use *','*.
+   * Enter your constraints and put a relation sign before each restraint value, e.g. *'2,3>1200'* which will equal *'2\*x1 + 3\*x2 >= 1200'*. Supported relation signs are *'<'*, *'>'* and *'='*. Instead of *'<'* you may also use *','*.
    * After you press *ENTER* your provided linear problem will show up below.
 <p align="center">
       <img src="media/problem-input.png" alt="Example problem input" width="400" >
