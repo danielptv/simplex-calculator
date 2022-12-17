@@ -4,7 +4,7 @@ package com.danielptv.simplex.entity;
 /**
  * Enum for the types of special simplex problem solutions.
  */
-public enum SolutionType {
+public enum SpecialSolutionType {
     /**
      * Message for problems with multiple solutions.
      */
@@ -26,7 +26,7 @@ public enum SolutionType {
             "  A variable must enter the base but no variable can leave."));
     private final String value;
 
-    SolutionType(final String value) {
+    SpecialSolutionType(final String value) {
         this.value = value;
     }
 

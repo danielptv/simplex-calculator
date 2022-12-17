@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.danielptv.simplex.entity.SolutionType.MULTIPLE_SOLUTIONS;
+import static com.danielptv.simplex.entity.SpecialSolutionType.MULTIPLE_SOLUTIONS;
 
 /**
  * Utility-Class for displaying output.
@@ -216,18 +216,18 @@ public final class OutputUtils {
     @SuppressWarnings("MagicNumber")
     static <T extends CalculableImpl<T>> StringBuilder printPhaseResult(@NonNull final Phase<T> phase) {
         final var sb = new StringBuilder();
-        final var table = phase.getTables().get(phase.getTables().size() - 1);
+        final var table = phase.tables().get(phase.tables().size() - 1);
 
-        if (phase.getSolutionType() != null && phase.getSolutionType() != MULTIPLE_SOLUTIONS) {
+        if (phase.specialSolutionType() != null && phase.specialSolutionType() != MULTIPLE_SOLUTIONS) {
             sb.append(FONT_RED);
-            sb.append(phase.getSolutionType());
+            sb.append(phase.specialSolutionType());
             sb.append(STYLE_RESET);
             return sb;
         }
 
         sb.append(FONT_GREEN);
-        sb.append(phase.getSolutionType() != null
-                ? phase.getSolutionType()
+        sb.append(phase.specialSolutionType() != null
+                ? phase.specialSolutionType()
                 : String.format("  The optimal solution is:%n"));
         sb.append("  f(x) = ").append(table.rHS().get(0).toDecimal().toPlainString()).append(String.format("%n"));
         final var variables = table.columnHeaders().stream()

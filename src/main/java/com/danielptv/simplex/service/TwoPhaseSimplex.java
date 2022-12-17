@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.danielptv.simplex.entity.SolutionType.INFEASIBLE;
-import static com.danielptv.simplex.entity.SolutionType.MULTIPLE_SOLUTIONS;
-import static com.danielptv.simplex.entity.SolutionType.UNBOUNDED;
+import static com.danielptv.simplex.entity.SpecialSolutionType.INFEASIBLE;
+import static com.danielptv.simplex.entity.SpecialSolutionType.MULTIPLE_SOLUTIONS;
+import static com.danielptv.simplex.entity.SpecialSolutionType.UNBOUNDED;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_1;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_2;
 import static com.danielptv.simplex.presentation.OutputUtils.SIMPLEX_HEADLINE;
@@ -49,7 +49,7 @@ public final class TwoPhaseSimplex {
             final var phase = phase1(table);
             result.add(phase);
 
-            if (phase.getSolutionType() != null) {
+            if (phase.specialSolutionType() != null) {
                 return result;
             }
 
@@ -70,7 +70,7 @@ public final class TwoPhaseSimplex {
      * @return A Phase containing all intermediary tables.
      */
     static <T extends CalculableImpl<T>> Phase<T> phase1(@NonNull final Table<T> simplexTable) {
-        final var phase = new Phase<T>(PHASE_1);
+        final var tables = new ArrayList<Table<T>>();
         final var inst = simplexTable.inst();
 
         // add helper columns
@@ -78,19 +78,18 @@ public final class TwoPhaseSimplex {
 
         // transform table to its canonical form
         table = transformToCanonical(table);
-        phase.addTable(new Table<>(table, "INITIAL TABLE"));
+        tables.add(new Table<>(table, "INITIAL TABLE"));
 
         // transform table until acceptable for primary simplex
         for (int count = 1; !isValid(table); ++count) {
             table = transform(table);
-            phase.addTable(new Table<>(table, "ITERATION " + count));
+            tables.add(new Table<>(table, "ITERATION " + count));
 
             if (isOptimal(table) && !table.rHS().get(0).equals(inst.create("0"))) {
-                phase.setSolutionType(INFEASIBLE);
-                return phase;
+                return new Phase<>(PHASE_1, tables, INFEASIBLE);
             }
         }
-        return phase;
+        return new Phase<>(PHASE_1, tables, null);
     }
 
     /**
@@ -103,25 +102,24 @@ public final class TwoPhaseSimplex {
      */
     static <T extends CalculableImpl<T>> Phase<T> phase2(@NonNull final Table<T> simplexTable,
                                                          @NonNull final String headline) {
-        final var phase = new Phase<T>(headline);
+        final var tables = new ArrayList<Table<T>>();
         var table = simplexTable;
-        phase.addTable(new Table<>(table, "INITIAL TABLE"));
+        tables.add(new Table<>(table, "INITIAL TABLE"));
 
         // transform the table until an optimal solution is found
         for (int count = 1; !isOptimal(table); ++count) {
             table = transform(table);
-            phase.addTable(new Table<>(table, "ITERATION " + count));
+            tables.add(new Table<>(table, "ITERATION " + count));
 
             final var pivotElement = table.pivot();
             if (pivotElement.value().isInfinite()) {
-                phase.setSolutionType(UNBOUNDED);
-                return phase;
+                return new Phase<>(headline, tables, UNBOUNDED);
             }
         }
         if (isDegenerate(table)) {
-            phase.setSolutionType(MULTIPLE_SOLUTIONS);
+            return new Phase<>(headline, tables, MULTIPLE_SOLUTIONS);
         }
-        return phase;
+        return new Phase<>(headline, tables, null);
     }
 
     /**

@@ -2,11 +2,8 @@ package com.danielptv.simplex.entity;
 
 import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.presentation.OutputUtils;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -16,37 +13,16 @@ import static com.danielptv.simplex.presentation.OutputUtils.STYLE_RESET;
 /**
  * Entity-Class representing a phase of the Two-Phase-Simplex Method.
  *
+ * @param title Title of the phase.
+ * @param tables Tables of the phase.
+ * @param specialSolutionType Solution type of the phase.
  * @param <T> Fraction or RoundedDecimal
  */
-public class Phase<T extends CalculableImpl<T>> {
-    @Getter
-    @NonNull
-    private final List<Table<T>> tables;
-    @NonNull
-    @Getter
-    private final String title;
-    @Getter
-    @Setter
-    private SolutionType solutionType;
-
-    /**
-     * Constructor for a Phase.
-     *
-     * @param title Title of the phase.
-     */
-    public Phase(@NonNull final String title) {
-        this.title = title;
-        tables = new ArrayList<>();
-    }
-
-    /**
-     * Method for adding a table to the phase.
-     *
-     * @param table The table.
-     */
-    public void addTable(@NonNull final Table<T> table) {
-        tables.add(table);
-    }
+public record Phase<T extends CalculableImpl<T>>(
+        @NonNull String title,
+        @NonNull List<Table<T>> tables,
+        SpecialSolutionType specialSolutionType
+) {
 
     /**
      * Method for getting the last table of the phase.
