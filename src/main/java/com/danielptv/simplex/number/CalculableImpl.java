@@ -1,4 +1,4 @@
-package com.danielptv.simplex.entity;
+package com.danielptv.simplex.number;
 
 import java.math.BigDecimal;
 
@@ -41,16 +41,24 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T create(String s);
 
     /**
-     * Method for creating an artificial MaxValue.
-     *
-     * @return Large Fraction or RoundedDecimal.
-     */
-    T maxValue();
-
-    /**
      * Method for getting the value as BigDecimal.
      *
      * @return The value as BigDecimal.
      */
     BigDecimal toDecimal();
+
+    /**
+     * Method for setting the value of a number to infinity.
+     *
+     * @param infinityType Positive or negative infinity.
+     * @return Infinity.
+     */
+    T toInfinity(InfinityType infinityType);
+
+    /**
+     * Method for determining whether a number is infinite.
+     *
+     * @return True if infinite else false.
+     */
+    boolean isInfinite();
 }

@@ -1,6 +1,6 @@
 package com.danielptv.simplex.presentation;
 
-import com.danielptv.simplex.entity.CalculableImpl;
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
 import com.danielptv.simplex.entity.Table;
 import com.danielptv.simplex.entity.TableDTO;
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+
+import static com.danielptv.simplex.entity.SolutionType.MULTIPLE_SOLUTIONS;
 
 /**
  * Utility-Class for displaying output.
@@ -208,7 +210,7 @@ public final class OutputUtils {
      * Method for printing the final result of a Simplex-Phase.
      *
      * @param phase A Simplex-Phase.
-     * @param <T> Fraction or RoundedDecimal
+     * @param <T>   Fraction or RoundedDecimal
      * @return The final result as StringBuilder.
      */
     @SuppressWarnings("MagicNumber")
@@ -216,15 +218,17 @@ public final class OutputUtils {
         final var sb = new StringBuilder();
         final var table = phase.getTables().get(phase.getTables().size() - 1);
 
-        if (phase.getNoSolutionType() != null) {
+        if (phase.getSolutionType() != null && phase.getSolutionType() != MULTIPLE_SOLUTIONS) {
             sb.append(FONT_RED);
-            sb.append(phase.getNoSolutionType());
+            sb.append(phase.getSolutionType());
             sb.append(STYLE_RESET);
             return sb;
         }
 
         sb.append(FONT_GREEN);
-        sb.append(String.format("  OUTPUT:%n"));
+        sb.append(phase.getSolutionType() != null
+                ? phase.getSolutionType()
+                : String.format("  The optimal solution is:%n"));
         sb.append("  f(x) = ").append(table.rHS().get(0).toDecimal().toPlainString()).append(String.format("%n"));
         final var variables = table.columnHeaders().stream()
                 .filter(e -> e.contains("x"))

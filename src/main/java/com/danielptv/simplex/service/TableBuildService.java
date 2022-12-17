@@ -1,6 +1,6 @@
 package com.danielptv.simplex.service;
 
-import com.danielptv.simplex.entity.CalculableImpl;
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.entity.Table;
 import com.danielptv.simplex.entity.TableDTO;
@@ -43,7 +43,7 @@ public final class TableBuildService {
         final var columnHeaders = buildColumnHeaders(varCount, constraintCount);
         final var rowHeadersTemp = buildRowHeaders(constraintCount, getNegativeRows(rHS, inst));
         final var rowHeaders = enumerateRowHeaders(rowHeadersTemp, columnHeaders);
-        final var pivot = setPivot(lHS, rHS, null, inst);
+        final var pivot = setPivot(lHS, rHS, false, inst);
 
         return new Table<>(inst, " ", lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
     }
@@ -190,7 +190,7 @@ public final class TableBuildService {
     /**
      * Helper-Method for enumerating row headers based on the column the restriction is in.
      *
-     * @param rowHeaders The row headers to be enumerated.
+     * @param rowHeaders    The row headers to be enumerated.
      * @param columnHeaders The column headers.
      * @return The enumerated row headers.
      */

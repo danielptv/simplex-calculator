@@ -1,5 +1,7 @@
 package com.danielptv.simplex.entity;
 
+import com.danielptv.simplex.number.CalculableImpl;
+
 import java.util.List;
 
 import static com.danielptv.simplex.presentation.OutputUtils.printTableDTO;

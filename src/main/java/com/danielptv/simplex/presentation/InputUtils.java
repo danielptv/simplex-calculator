@@ -1,8 +1,8 @@
 package com.danielptv.simplex.presentation;
 
-import com.danielptv.simplex.entity.CalculableImpl;
-import com.danielptv.simplex.entity.Fraction;
-import com.danielptv.simplex.entity.RoundedDecimal;
+import com.danielptv.simplex.number.CalculableImpl;
+import com.danielptv.simplex.number.Fraction;
+import com.danielptv.simplex.number.RoundedDecimal;
 import com.danielptv.simplex.entity.TableDTO;
 import lombok.NonNull;
 

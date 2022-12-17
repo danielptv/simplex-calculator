@@ -1,5 +1,6 @@
 package com.danielptv.simplex.entity;
 
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.presentation.OutputUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +27,7 @@ public class Phase<T extends CalculableImpl<T>> {
     private final String title;
     @Getter
     @Setter
-    private NoSolutionType noSolutionType;
+    private SolutionType solutionType;
 
     /**
      * Constructor for a Phase.

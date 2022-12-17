@@ -1,5 +1,6 @@
 package com.danielptv.simplex.entity;
 
+import com.danielptv.simplex.number.CalculableImpl;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -146,7 +147,7 @@ public class Row<T extends CalculableImpl<T>> {
      * @param index The index.
      * @return The entry.
      */
-    public T getElementByIndex(final int index) {
+    public T getElement(final int index) {
         return entries.get(index);
     }
 

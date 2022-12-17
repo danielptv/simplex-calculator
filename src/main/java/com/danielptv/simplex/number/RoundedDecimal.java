@@ -1,4 +1,4 @@
-package com.danielptv.simplex.entity;
+package com.danielptv.simplex.number;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +15,9 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
     @EqualsAndHashCode.Include
     @Getter
     private final BigDecimal value;
+    @EqualsAndHashCode.Include
+    @Getter
+    private final InfinityType infinityType;
     @Getter
     private final int mantissaLength;
 
@@ -26,6 +29,7 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
     public RoundedDecimal(final int mantissaLength) {
         value = new BigDecimal("0");
         this.mantissaLength = mantissaLength;
+        infinityType = null;
     }
 
     /**
@@ -36,6 +40,7 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
      */
     @SuppressWarnings("MagicNumber")
     public RoundedDecimal(@NonNull final String s, final int mantissaLength) {
+        infinityType = null;
         this.mantissaLength = mantissaLength;
         if (s.contains("/")) {
             final var split = s.split("/");
@@ -58,20 +63,28 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
     public RoundedDecimal(@NonNull final BigDecimal b, final int mantissaLength) {
         this.mantissaLength = mantissaLength;
         value = round(b);
+        infinityType = null;
     }
 
-    private RoundedDecimal(@NonNull final Long l) {
-        value = BigDecimal.valueOf(l);
-        this.mantissaLength = 0;
+    private RoundedDecimal(@NonNull final InfinityType infinityType) {
+        value = null;
+        this.infinityType = infinityType;
+        mantissaLength = 0;
     }
 
     @Override
     public String toString() {
+        if (infinityType != null) {
+            return infinityType.toString();
+        }
         return value.toPlainString();
     }
 
     @Override
     public int compareTo(@NonNull final RoundedDecimal o) {
+        if (infinityType != null || o.infinityType != null) {
+            return InfinityType.compare(infinityType, o.infinityType);
+        }
         return value.compareTo(o.value);
     }
 
@@ -153,16 +166,6 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
     }
 
     /**
-     * Method for creating an artificial MaxValue.
-     *
-     * @return A large RoundedDecimal.
-     */
-    @Override
-    public RoundedDecimal maxValue() {
-        return new RoundedDecimal(Long.MAX_VALUE);
-    }
-
-    /**
      * Method for getting the value as BigDecimal.
      *
      * @return The value as BigDecimal rounded to 2 decimal places.
@@ -172,4 +175,13 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
         return value.setScale(2, RoundingMode.HALF_EVEN).stripTrailingZeros();
     }
 
+    @Override
+    public RoundedDecimal toInfinity(@NonNull final InfinityType type) {
+        return new RoundedDecimal(type);
+    }
+
+    @Override
+    public boolean isInfinite() {
+        return infinityType != null;
+    }
 }

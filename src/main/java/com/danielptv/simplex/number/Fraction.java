@@ -1,4 +1,4 @@
-package com.danielptv.simplex.entity;
+package com.danielptv.simplex.number;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,6 +20,9 @@ public class Fraction implements CalculableImpl<Fraction> {
     @EqualsAndHashCode.Include
     @Getter
     private final BigInteger denominator;
+    @EqualsAndHashCode.Include
+    @Getter
+    private final InfinityType infinityType;
 
     /**
      * Constructor for a Fraction.
@@ -27,6 +30,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     public Fraction() {
         numerator = new BigInteger("0");
         denominator = new BigInteger("1");
+        infinityType = null;
     }
 
     /**
@@ -36,6 +40,7 @@ public class Fraction implements CalculableImpl<Fraction> {
      */
     @SuppressWarnings({"ReturnCount", "MagicNumber"})
     public Fraction(@NonNull final String fraction) {
+        infinityType = null;
         if (fraction.contains("/")) {
             final var split = fraction.split("/");
             if (split.length != 2 || new BigInteger("0").equals(new BigInteger(split[1]))) {
@@ -75,6 +80,13 @@ public class Fraction implements CalculableImpl<Fraction> {
         final var simplified = simplify(num, denom);
         numerator = simplified.getValue0();
         denominator = simplified.getValue1();
+        infinityType = null;
+    }
+
+    private Fraction(@NonNull final InfinityType infinityType) {
+        numerator = null;
+        denominator = null;
+        this.infinityType = infinityType;
     }
 
     /**
@@ -123,16 +135,6 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for generating an artificial MaxValue.
-     *
-     * @return A large Fraction.
-     */
-    @Override
-    public Fraction maxValue() {
-        return new Fraction(BigInteger.valueOf(Long.MAX_VALUE), BigInteger.valueOf(1));
-    }
-
-    /**
      * Method for getting the value as BigDecimal.
      *
      * @return The value as BigDecimal rounded to 2 decimal places.
@@ -145,8 +147,21 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     @Override
+    public Fraction toInfinity(@NonNull final InfinityType type) {
+        return new Fraction(type);
+    }
+
+    @Override
+    public boolean isInfinite() {
+        return infinityType != null;
+    }
+
+    @Override
     @SuppressWarnings("MagicNumber")
     public int compareTo(@NonNull final Fraction f) {
+        if (infinityType != null || f.infinityType != null) {
+            return InfinityType.compare(infinityType, f.infinityType);
+        }
         final var currV = new BigDecimal(numerator).divide(new BigDecimal(denominator), 20, RoundingMode.HALF_EVEN);
         final var newV = new BigDecimal(f.numerator).divide(new BigDecimal(f.denominator), 20, RoundingMode.HALF_EVEN);
         return currV.compareTo(newV);
@@ -156,6 +171,9 @@ public class Fraction implements CalculableImpl<Fraction> {
     @SuppressWarnings("ReturnCount")
     public String toString() {
 
+        if (infinityType != null) {
+            return infinityType.toString();
+        }
         if (numerator.intValue() == 0) {
             return numerator.toString();
         }

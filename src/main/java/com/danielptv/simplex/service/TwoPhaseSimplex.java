@@ -1,6 +1,6 @@
 package com.danielptv.simplex.service;
 
-import com.danielptv.simplex.entity.CalculableImpl;
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
 import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.entity.Table;
@@ -10,21 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.danielptv.simplex.entity.NoSolutionType.INFEASIBLE;
-import static com.danielptv.simplex.entity.NoSolutionType.UNBOUNDED;
+import static com.danielptv.simplex.entity.SolutionType.INFEASIBLE;
+import static com.danielptv.simplex.entity.SolutionType.MULTIPLE_SOLUTIONS;
+import static com.danielptv.simplex.entity.SolutionType.UNBOUNDED;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_1;
 import static com.danielptv.simplex.presentation.OutputUtils.PHASE_2;
 import static com.danielptv.simplex.presentation.OutputUtils.SIMPLEX_HEADLINE;
-import static com.danielptv.simplex.service.TableCalcService.getPivotElement;
+import static com.danielptv.simplex.service.TableCalcService.isDegenerate;
 import static com.danielptv.simplex.service.TableCalcService.isOptimal;
-import static com.danielptv.simplex.service.TableCalcService.isSimplexAcceptable;
+import static com.danielptv.simplex.service.TableCalcService.isValid;
 import static com.danielptv.simplex.service.TableCalcService.setPivot;
 import static com.danielptv.simplex.service.TableCalcService.updateRowHeaders;
 import static com.danielptv.simplex.service.TableExtensionService.buildExtension;
 import static com.danielptv.simplex.service.TableExtensionService.removeExtension;
 
 /**
- * Service-Class for Simplex-Algorithm calculations.
+ * Service-Class for simplex calculations.
  */
 public final class TwoPhaseSimplex {
 
@@ -35,20 +36,20 @@ public final class TwoPhaseSimplex {
     /**
      * Method for calculating a linear problem.
      *
-     * @param simplexTable The initial Simplex-Table.
+     * @param simplexTable The initial simplex table.
      * @param <T>          Fraction or RoundedDecimal.
-     * @return A List containing the resulting Simplex-Phases.
+     * @return A List containing the resulting simplex phases.
      */
     public static <T extends CalculableImpl<T>> List<Phase<T>> calc(@NonNull final Table<T> simplexTable) {
         final var result = new ArrayList<Phase<T>>(2);
         var table = simplexTable;
 
         // optional phase 1
-        if (!isSimplexAcceptable(table.rHS(), false, table.inst())) {
+        if (!isValid(table)) {
             final var phase = phase1(table);
             result.add(phase);
 
-            if (phase.getNoSolutionType() != null) {
+            if (phase.getSolutionType() != null) {
                 return result;
             }
 
@@ -80,16 +81,12 @@ public final class TwoPhaseSimplex {
         phase.addTable(new Table<>(table, "INITIAL TABLE"));
 
         // transform table until acceptable for primary simplex
-        var count = 1;
-        var isSimplexAcceptable = isSimplexAcceptable(table.rHS(), true, inst);
-        while (!isSimplexAcceptable) {
+        for (int count = 1; !isValid(table); ++count) {
             table = transform(table);
             phase.addTable(new Table<>(table, "ITERATION " + count));
-            isSimplexAcceptable = isSimplexAcceptable(table.rHS(), true, inst);
-            count++;
 
-            if (isOptimal(table.lHS(), table.extendedLHS()) && !table.rHS().get(0).equals(inst.create("0"))) {
-                phase.setNoSolutionType(INFEASIBLE);
+            if (isOptimal(table) && !table.rHS().get(0).equals(inst.create("0"))) {
+                phase.setSolutionType(INFEASIBLE);
                 return phase;
             }
         }
@@ -107,25 +104,22 @@ public final class TwoPhaseSimplex {
     static <T extends CalculableImpl<T>> Phase<T> phase2(@NonNull final Table<T> simplexTable,
                                                          @NonNull final String headline) {
         final var phase = new Phase<T>(headline);
-        final var inst = simplexTable.inst();
         var table = simplexTable;
         phase.addTable(new Table<>(table, "INITIAL TABLE"));
 
         // transform the table until an optimal solution is found
-        var count = 1;
-        var isOptimal = isOptimal(table.lHS(), table.extendedLHS());
-        while (!isOptimal) {
+        for (int count = 1; !isOptimal(table); ++count) {
             table = transform(table);
             phase.addTable(new Table<>(table, "ITERATION " + count));
 
-            final var pivotElement = table.lHS().get(table.pivot().row()).getElementByIndex(table.pivot().column());
-            if (pivotElement.compareTo(inst.create("0")) < 0) {
-                phase.setNoSolutionType(UNBOUNDED);
+            final var pivotElement = table.pivot();
+            if (pivotElement.value().isInfinite()) {
+                phase.setSolutionType(UNBOUNDED);
                 return phase;
             }
-
-            isOptimal = isOptimal(table.lHS(), table.extendedLHS());
-            count++;
+        }
+        if (isDegenerate(table)) {
+            phase.setSolutionType(MULTIPLE_SOLUTIONS);
         }
         return phase;
     }
@@ -138,8 +132,7 @@ public final class TwoPhaseSimplex {
      * @return The resulting Simplex-Table.
      */
     @SuppressWarnings("LambdaBodyLength")
-    public static <T extends CalculableImpl<T>> @NonNull Table<T> transform(
-            @NonNull final Table<T> table) {
+    public static <T extends CalculableImpl<T>> @NonNull Table<T> transform(@NonNull final Table<T> table) {
         final var inst = table.inst();
         final var rowCount = table.rHS().size();
         final var columnHeaders = table.columnHeaders();
@@ -149,7 +142,7 @@ public final class TwoPhaseSimplex {
         rowHeaders = updateRowHeaders(columnHeaders, table.rowHeaders(), pivot);
 
         // find divisor and divide
-        final var divisor = getPivotElement(pivot, table.lHS());
+        final var divisor = pivot.value();
         final var lHS = new ArrayList<>(table.lHS());
         lHS.set(pivot.row(), lHS.get(pivot.row()).divideRow(divisor));
         var extendedLHS = table.extendedLHS();
@@ -164,7 +157,7 @@ public final class TwoPhaseSimplex {
         //find factors
         final List<T> factors;
         factors = lHS.stream()
-                .map(e -> e.getElementByIndex(pivot.column()).multiply(inst.create("-1")))
+                .map(e -> e.getElement(pivot.column()).multiply(inst.create("-1")))
                 .toList();
 
         //iterate
@@ -197,7 +190,7 @@ public final class TwoPhaseSimplex {
         final var newPivot = setPivot(
                 lHS,
                 rHS,
-                finalExtendedLHS,
+                finalExtendedLHS != null,
                 inst);
 
         return new Table<>(
@@ -219,8 +212,7 @@ public final class TwoPhaseSimplex {
      * @param <T>   Fraction or RoundedDecimal
      * @return The transformed table.
      */
-    public static <T extends CalculableImpl<T>> @NonNull Table<T> transformToCanonical(
-            @NonNull final Table<T> table) {
+    public static <T extends CalculableImpl<T>> @NonNull Table<T> transformToCanonical(@NonNull final Table<T> table) {
 
         if (table.extendedLHS() == null) {
             throw new IllegalArgumentException();
@@ -242,7 +234,7 @@ public final class TwoPhaseSimplex {
                     }
                 });
 
-        final var pivot = setPivot(lHs, rHS, extendedLHS, inst);
+        final var pivot = setPivot(lHs, rHS, true, inst);
         return new Table<>(
                 inst,
                 table.title(),

@@ -1,6 +1,6 @@
 package com.danielptv.simplex.service;
 
-import com.danielptv.simplex.entity.CalculableImpl;
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.entity.Table;
 import lombok.NonNull;
@@ -28,8 +28,7 @@ final class TableExtensionService {
      * @return The extended Table.
      * @throws UnsupportedOperationException When the input table is already extended.
      */
-    static <T extends CalculableImpl<T>> Table<T> buildExtension(
-            @NonNull final Table<T> table) {
+    static <T extends CalculableImpl<T>> Table<T> buildExtension(@NonNull final Table<T> table) {
         if (table.extendedLHS() != null) {
             throw new UnsupportedOperationException("Table is already extended!");
         }
@@ -52,7 +51,7 @@ final class TableExtensionService {
         final var rowHeaders = new ArrayList<>(table.rowHeaders());
         rowHeaders.add(0, "z'");
 
-        final var pivot = setPivot(lHS, rHS, extendedLHS, inst);
+        final var pivot = setPivot(lHS, rHS, true, inst);
 
         return new Table<>(
                 inst,
@@ -74,8 +73,7 @@ final class TableExtensionService {
      * @return A not-extended Table.
      * @throws UnsupportedOperationException When the input table is not extended.
      */
-    static <T extends CalculableImpl<T>> Table<T> removeExtension(
-            @NonNull final Table<T> table) {
+    static <T extends CalculableImpl<T>> Table<T> removeExtension(@NonNull final Table<T> table) {
         if (table.extendedLHS() == null) {
             throw new UnsupportedOperationException("Table is not extended!");
         }
@@ -85,7 +83,7 @@ final class TableExtensionService {
         lHS.remove(0);
         final var rHS = new ArrayList<>(table.rHS());
         rHS.remove(0);
-        final var pivot = setPivot(lHS, rHS, null, inst);
+        final var pivot = setPivot(lHS, rHS, false, inst);
 
         final var columnHeaders = new ArrayList<>(table.columnHeaders());
         IntStream.range(0, table.extensionSize())
@@ -95,7 +93,17 @@ final class TableExtensionService {
                 });
         final var rowHeaders = new ArrayList<>(table.rowHeaders());
         rowHeaders.remove(0);
-        return new Table<>(inst, table.title(), lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
+        return new Table<>(
+                inst,
+                table.title(),
+                lHS,
+                null,
+                rHS,
+                pivot,
+                columnHeaders,
+                rowHeaders,
+                0
+        );
     }
 
     /**

@@ -1,12 +1,13 @@
 package com.danielptv.simplex.entity;
 
+import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.presentation.OutputUtils;
 import lombok.NonNull;
 
 import java.util.List;
 
 /**
- * Record representing a Simplex-Table.
+ * Record representing a simplex table.
  *
  * @param inst          Instance of the number type to be calculated with.
  * @param title         Title of the table.
@@ -26,7 +27,7 @@ public record Table<T extends CalculableImpl<T>>(
         @NonNull List<Row<T>> lHS,
         List<Row<T>> extendedLHS,
         @NonNull List<T> rHS,
-        @NonNull Pivot pivot,
+        @NonNull Pivot<T> pivot,
         @NonNull List<String> columnHeaders,
         @NonNull List<String> rowHeaders,
         int extensionSize
