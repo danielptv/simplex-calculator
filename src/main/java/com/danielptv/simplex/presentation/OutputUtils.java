@@ -1,5 +1,6 @@
 package com.danielptv.simplex.presentation;
 
+import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
 import com.danielptv.simplex.entity.Table;
@@ -107,9 +108,9 @@ public final class OutputUtils {
     }
 
     /**
-     * Method for accentuating the pivot element during output.
+     * Accentuate the pivot element during output.
      *
-     * @param table The corresponding Simplex-Table.
+     * @param table The table.
      */
     @SuppressWarnings("ReturnCount")
     public static void accentuatePivot(@NonNull final Table<?> table) {
@@ -117,24 +118,20 @@ public final class OutputUtils {
     }
 
     /**
-     * Method for printing a Simplex-Table.
+     * Print a table.
      *
-     * @param table The corresponding Simplex-Table.
-     * @return The String-Representation of the table as StringBuilder.
+     * @param table The table.
+     * @return The table as StringBuilder.
      */
     @SuppressWarnings("MagicNumber")
     public static StringBuilder printTable(@NonNull final Table<?> table) {
         setMaxEntryWidths(table);
 
         final var lHS = table.lHS();
-        final var extendedLHS = table.extendedLHS();
         final var rHS = table.rHS();
 
         final var rHSWidth = getRhsWidth(rHS);
         final var entryWidths = new ArrayList<>(lHS.get(0).getEntryWidths());
-        if (table.extendedLHS() != null) {
-            entryWidths.addAll(extendedLHS.get(0).getEntryWidths());
-        }
         entryWidths.add(rHSWidth);
 
         final var line = new StringBuilder();
@@ -157,7 +154,7 @@ public final class OutputUtils {
     }
 
     /**
-     * Method for printing the problem bounds.
+     * Print the problem bounds.
      *
      * @param tableDTO TableDTO containing the problem bounds.
      * @return The problem bounds as StringBuilder.
@@ -207,9 +204,9 @@ public final class OutputUtils {
     }
 
     /**
-     * Method for printing the final result of a Simplex-Phase.
+     * Print the final result of a simplex phase.
      *
-     * @param phase A Simplex-Phase.
+     * @param phase A simplex phase.
      * @param <T>   Fraction or RoundedDecimal
      * @return The final result as StringBuilder.
      */
@@ -256,19 +253,18 @@ public final class OutputUtils {
     }
 
     /**
-     * Helper-Method for printing a Simplex-Table.
+     * Print the body of a table.
      *
-     * @param table       The corresponding Simplex-Table.
+     * @param table       The table.
      * @param line        A divider-line with length equal to the table width.
-     * @param entryWidths A List of maximal entry widths per column.
-     * @return The String-Representation of the table body as StringBuilder.
+     * @param entryWidths A list of maximal entry widths per column.
+     * @return The table body as StringBuilder.
      */
     @SuppressWarnings("LambdaBodyLength")
     static StringBuilder printBody(@NonNull final Table<?> table,
                                    @NonNull final StringBuilder line,
                                    @NonNull final List<Integer> entryWidths) {
         final var lHS = table.lHS();
-        final var extendedLHS = table.extendedLHS();
         final var rHS = table.rHS();
         final var rowHeaders = table.rowHeaders();
         final var columnHeaders = table.columnHeaders();
@@ -284,25 +280,16 @@ public final class OutputUtils {
                 .forEach(e -> {
                     sb.append(String.format("  | %-6s ", rowHeaders.get(e)));
                     sb.append(lHS.get(e));
-                    if (extendedLHS != null) {
-                        sb.append(extendedLHS.get(e));
-                        sb.append("|");
-                        sb.append(String.format("  %-" + getRhsWidth(rHS) + "s  |%n", rHS.get(e)));
-                        if (e == 0 || e == 1) {
-                            sb.append(line);
-                        }
-                    } else {
-                        sb.append(String.format("|  %-" + getRhsWidth(rHS) + "s  |%n", rHS.get(e)));
-                        if (e == 0) {
-                            sb.append(line);
-                        }
+                    sb.append(String.format("|  %-" + getRhsWidth(rHS) + "s  |%n", rHS.get(e)));
+                    if (e == 0 || e == 1 && table.helperColumns() != 0) {
+                        sb.append(line);
                     }
                 });
         return sb;
     }
 
     /**
-     * Helper-Method to get the maximum entry width for the right-hand side of a Simplex-Table.
+     * Get the maximum entry width for the right-hand side of a table.
      *
      * @param rHS The right-hand side.
      * @return The maximum entry width.
@@ -314,38 +301,17 @@ public final class OutputUtils {
     }
 
     /**
-     * Method for setting the maximal entry widths per column.
+     * Set the maximal entry widths per column within a table.
      *
-     * @param table The corresponding Table.
+     * @param table The table.
      */
     static void setMaxEntryWidths(@NonNull final Table<?> table) {
-        final var maxEntryWidths = new ArrayList<Integer>();
-        for (int i = 0; i < table.lHS().get(0).getEntries().size(); ++i) {
-            final var finalI = i;
-            final var maxWidth = Collections.max(table.lHS().stream()
-                    .map(e -> {
-                        e.setEntryWidths();
-                        return e.getEntryWidths().get(finalI);
-                    })
-                    .toList());
-            maxEntryWidths.add(maxWidth);
-        }
+        table.lHS().forEach(Row::setEntryWidths);
+        final var maxEntryWidths = IntStream.range(0, table.columns())
+                .mapToObj(i -> Collections.max(table.lHS().stream()
+                        .map(entry -> entry.getEntryWidths().get(i))
+                        .toList()))
+                .toList();
         table.lHS().forEach(e -> e.setEntryWidths(maxEntryWidths));
-
-        if (table.extendedLHS() != null) {
-            final var extensionMaxEntryWidths = new ArrayList<Integer>();
-            for (int i = 0; i < table.extensionSize(); ++i) {
-                final var finalI = i;
-                final var maxWidth = Collections.max(table.extendedLHS().stream()
-                        .map(e -> {
-                            e.setEntryWidths();
-                            return e.getEntryWidths().get(finalI);
-                        })
-                        .toList());
-                extensionMaxEntryWidths.add(maxWidth);
-            }
-            table.extendedLHS().forEach(e -> e.setEntryWidths(extensionMaxEntryWidths));
-        }
     }
-
 }

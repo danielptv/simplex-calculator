@@ -1,7 +1,6 @@
 package com.danielptv.simplex.entity;
 
 import com.danielptv.simplex.number.CalculableImpl;
-import com.danielptv.simplex.presentation.OutputUtils;
 import lombok.NonNull;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.stream.IntStream;
 
 import static com.danielptv.simplex.presentation.OutputUtils.FONT_GREEN;
 import static com.danielptv.simplex.presentation.OutputUtils.STYLE_RESET;
+import static com.danielptv.simplex.presentation.OutputUtils.accentuatePivot;
 
 /**
  * Entity-Class representing a phase of the Two-Phase-Simplex Method.
@@ -25,7 +25,7 @@ public record Phase<T extends CalculableImpl<T>>(
 ) {
 
     /**
-     * Method for getting the last table of the phase.
+     * Get the last table of the phase.
      *
      * @return The last table.
      */
@@ -36,7 +36,7 @@ public record Phase<T extends CalculableImpl<T>>(
     @Override
     public String toString() {
         IntStream.range(0, tables.size() - 1)
-                .forEach(i -> OutputUtils.accentuatePivot(tables.get(i)));
+                .forEach(i -> accentuatePivot(tables.get(i)));
 
         final var sb = new StringBuilder();
         sb.append("  ");

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<T> {
     /**
-     * Method for multiplication.
+     * Multiply two values.
      *
      * @param c Fraction or RoundedDecimal.
      * @return Fraction or RoundedDecimal.
@@ -17,7 +17,7 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T multiply(T c);
 
     /**
-     * Method for division.
+     * Divide two values.
      *
      * @param c Fraction or RoundedDecimal.
      * @return Fraction or RoundedDecimal.
@@ -25,7 +25,7 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T divide(T c);
 
     /**
-     * Method for addition.
+     * Add two values.
      *
      * @param c Fraction or RoundedDecimal.
      * @return Fraction or RoundedDecimal.
@@ -33,7 +33,7 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T add(T c);
 
     /**
-     * Method for creating new Fraction or RoundedDecimal from an existing one.
+     * Create a new Fraction or RoundedDecimal from an existing one.
      *
      * @param s String representation of the number.
      * @return Fraction or RoundedDecimal.
@@ -41,14 +41,14 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T create(String s);
 
     /**
-     * Method for getting the value as BigDecimal.
+     * Get the value as BigDecimal.
      *
      * @return The value as BigDecimal.
      */
     BigDecimal toDecimal();
 
     /**
-     * Method for setting the value of a number to infinity.
+     * Set the value to infinity.
      *
      * @param infinityType Positive or negative infinity.
      * @return Infinity.
@@ -56,7 +56,7 @@ public interface CalculableImpl<T extends CalculableImpl<T>> extends Comparable<
     T toInfinity(InfinityType infinityType);
 
     /**
-     * Method for determining whether a number is infinite.
+     * Determine whether a value is infinite.
      *
      * @return True if infinite else false.
      */

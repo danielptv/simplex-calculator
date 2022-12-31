@@ -34,7 +34,7 @@ public final class TwoPhaseSimplex {
     }
 
     /**
-     * Method for calculating a linear problem.
+     * Calculate a linear problem.
      *
      * @param simplexTable The initial simplex table.
      * @param <T>          Fraction or RoundedDecimal.
@@ -52,7 +52,6 @@ public final class TwoPhaseSimplex {
             if (phase.specialSolutionType() != null) {
                 return result;
             }
-
             table = removeExtension(phase.getLastTable());
         }
 
@@ -63,7 +62,7 @@ public final class TwoPhaseSimplex {
     }
 
     /**
-     * Method for the first phase of the 2-Phase-Simplex method.
+     * Calculate the first phase of the two phase simplex method.
      *
      * @param simplexTable The initial simplex table.
      * @param <T>          Fraction or RoundedDecimal.
@@ -93,7 +92,7 @@ public final class TwoPhaseSimplex {
     }
 
     /**
-     * Method for the primary simplex.
+     * The primary simplex.
      *
      * @param simplexTable The initial simplex table.
      * @param headline     The headline for the phase.
@@ -104,6 +103,7 @@ public final class TwoPhaseSimplex {
                                                          @NonNull final String headline) {
         final var tables = new ArrayList<Table<T>>();
         var table = simplexTable;
+
         tables.add(new Table<>(table, "INITIAL TABLE"));
 
         // transform the table until an optimal solution is found
@@ -123,11 +123,11 @@ public final class TwoPhaseSimplex {
     }
 
     /**
-     * Method for transforming a Simplex-Table during an iteration.
+     * Transform a table during an iteration.
      *
-     * @param table A Simplex-Table.
+     * @param table A table.
      * @param <T>   Fraction or RoundedDecimal.
-     * @return The resulting Simplex-Table.
+     * @return The resulting table.
      */
     @SuppressWarnings("LambdaBodyLength")
     public static <T extends CalculableImpl<T>> @NonNull Table<T> transform(@NonNull final Table<T> table) {
@@ -143,14 +143,9 @@ public final class TwoPhaseSimplex {
         final var divisor = pivot.value();
         final var lHS = new ArrayList<>(table.lHS());
         lHS.set(pivot.row(), lHS.get(pivot.row()).divideRow(divisor));
-        var extendedLHS = table.extendedLHS();
 
         final var rHS = new ArrayList<>(table.rHS());
         rHS.set(pivot.row(), rHS.get(pivot.row()).divide(divisor));
-        if (table.extendedLHS() != null) {
-            extendedLHS = new ArrayList<>(extendedLHS);
-            extendedLHS.set(pivot.row(), extendedLHS.get(pivot.row()).divideRow(divisor));
-        }
 
         //find factors
         final List<T> factors;
@@ -160,26 +155,15 @@ public final class TwoPhaseSimplex {
 
         //iterate
         final List<T> finalFactors = factors;
-        if (table.extendedLHS() != null) {
-            extendedLHS = new ArrayList<>(extendedLHS);
-        }
-        final var finalExtendedLHS = extendedLHS;
         IntStream.range(0, rowCount)
                 .forEach(row -> {
                     if (row != pivot.row()) {
-                        var pivotTemp = new Row<>(lHS.get(pivot.row()));
-                        var currRow = new Row<>(lHS.get(row));
+                        final var pivotTemp = new Row<>(lHS.get(pivot.row()));
+                        final var currRow = new Row<>(lHS.get(row));
 
                         lHS.set(row, pivotTemp.multiplyRow(pivotTemp, finalFactors.get(row)));
                         lHS.set(row, lHS.get(row).addRow(currRow));
 
-                        if (table.extendedLHS() != null) {
-                            pivotTemp = new Row<>(finalExtendedLHS.get(pivot.row()));
-                            currRow = new Row<>(finalExtendedLHS.get(row));
-
-                            finalExtendedLHS.set(row, pivotTemp.multiplyRow(pivotTemp, finalFactors.get(row)));
-                            finalExtendedLHS.set(row, finalExtendedLHS.get(row).addRow(currRow));
-                        }
                         final var currVal = table.rHS().get(row);
                         rHS.set(row, rHS.get(pivot.row()).multiply(finalFactors.get(row)).add(currVal));
                     }
@@ -188,23 +172,22 @@ public final class TwoPhaseSimplex {
         final var newPivot = setPivot(
                 lHS,
                 rHS,
-                finalExtendedLHS != null,
+                table.helperColumns() != 0,
                 inst);
 
         return new Table<>(
                 inst,
                 table.title(),
                 lHS,
-                finalExtendedLHS,
                 rHS,
                 newPivot,
                 columnHeaders,
                 rowHeaders,
-                table.extensionSize());
+                table.helperColumns());
     }
 
     /**
-     * Method for transforming a table to its canonical form.
+     * Transform a table to its canonical form.
      *
      * @param table A Simplex-Table.
      * @param <T>   Fraction or RoundedDecimal
@@ -212,14 +195,13 @@ public final class TwoPhaseSimplex {
      */
     public static <T extends CalculableImpl<T>> @NonNull Table<T> transformToCanonical(@NonNull final Table<T> table) {
 
-        if (table.extendedLHS() == null) {
+        if (table.helperColumns() == 0) {
             throw new IllegalArgumentException();
         }
 
         final var inst = table.inst();
-        final var extensionSize = table.extensionSize();
+        final var extensionSize = table.helperColumns();
         final var lHs = new ArrayList<>(table.lHS());
-        final var extendedLHS = new ArrayList<>(table.extendedLHS());
         final var rHS = new ArrayList<>(table.rHS());
         final var rowHeaders = table.rowHeaders();
 
@@ -227,7 +209,6 @@ public final class TwoPhaseSimplex {
                 .forEach(i -> {
                     if (rowHeaders.get(i).contains("h")) {
                         lHs.set(0, lHs.get(0).addRow(lHs.get(i).invertRow()));
-                        extendedLHS.set(0, extendedLHS.get(0).addRow(extendedLHS.get(i).invertRow()));
                         rHS.set(0, rHS.get(0).add(rHS.get(i).multiply(inst.create("-1"))));
                     }
                 });
@@ -237,7 +218,6 @@ public final class TwoPhaseSimplex {
                 inst,
                 table.title(),
                 lHs,
-                extendedLHS,
                 rHS,
                 pivot,
                 table.columnHeaders(),

@@ -25,7 +25,7 @@ public final class InputUtils {
     }
 
     /**
-     * Method for parsing user input into a TableDTO.
+     * Parse user input into a TableDTO.
      *
      * @param tableDTO TableDTO containing problem bounds.
      * @param <T>      Fraction or RoundedDecimal.
@@ -45,7 +45,7 @@ public final class InputUtils {
     }
 
     /**
-     * Method for getting problem bounds from user input.
+     * Get the problem bounds from user input.
      *
      * @return TableDTO containing bounds necessary for building the table.
      */
@@ -96,7 +96,7 @@ public final class InputUtils {
     }
 
     /**
-     * Helper-Method for getting the number of variables or constraints from user input.
+     * Get the number of variables or constraints from user input.
      *
      * @param varOrConstraint String "variables" or "restrictions"
      * @return The number of variables or constraints.
@@ -124,7 +124,7 @@ public final class InputUtils {
     }
 
     /**
-     * Helper-Method for getting the objective function from user input.
+     * Get the objective function from user input.
      *
      * @param varCount The expected Number of variables.
      * @return The objective function as List of Strings.
@@ -155,7 +155,7 @@ public final class InputUtils {
     }
 
     /**
-     * Helper-Method for getting the restrictions from user input.
+     * Get the restrictions from user input.
      *
      * @param varCount      The expected number of variables.
      * @param restrictCount The expected number of restrictions.

@@ -88,12 +88,73 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
         return value.compareTo(o.value);
     }
 
+
     /**
-     * Method for rounding a BigDecimal.
+     * Multiply two RoundedDecimals.
      *
-     * @param d A BigDecimal.
-     * @return The rounded BigDecimal.
+     * @param d A RoundedDecimal.
+     * @return The result.
      */
+    @Override
+    public RoundedDecimal multiply(@NonNull final RoundedDecimal d) {
+        return new RoundedDecimal(value.multiply(d.value), d.mantissaLength);
+    }
+
+    /**
+     * Divide two RoundedDecimals.
+     *
+     * @param d A RoundedDecimal.
+     * @return The result.
+     */
+    @Override
+    @SuppressWarnings("MagicNumber")
+    public RoundedDecimal divide(@NonNull final RoundedDecimal d) {
+        return new RoundedDecimal(value.divide(d.value,
+                d.value.precision() + value.precision() + 20, RoundingMode.HALF_EVEN), d.mantissaLength);
+    }
+
+    /**
+     * Add two RoundedDecimals.
+     *
+     * @param d A RoundedDecimal.
+     * @return The result.
+     */
+    @Override
+    public RoundedDecimal add(@NonNull final RoundedDecimal d) {
+        return new RoundedDecimal(value.add(d.value), d.mantissaLength);
+    }
+
+    /**
+     * Create a new RoundedDecimal from an existing one.
+     *
+     * @param s String representation of the number.
+     * @return A RoundedDecimal.
+     */
+    @Override
+    public RoundedDecimal create(@NonNull final String s) {
+        return new RoundedDecimal(s, this.mantissaLength);
+    }
+
+    /**
+     * Get the value as BigDecimal.
+     *
+     * @return The value as BigDecimal rounded to 2 decimal places.
+     */
+    @Override
+    public BigDecimal toDecimal() {
+        return value.setScale(2, RoundingMode.HALF_EVEN).stripTrailingZeros();
+    }
+
+    @Override
+    public RoundedDecimal toInfinity(@NonNull final InfinityType type) {
+        return new RoundedDecimal(type);
+    }
+
+    @Override
+    public boolean isInfinite() {
+        return infinityType != null;
+    }
+
     @SuppressWarnings("MagicNumber")
     private BigDecimal round(@NonNull final BigDecimal d) {
 
@@ -119,69 +180,4 @@ public class RoundedDecimal implements CalculableImpl<RoundedDecimal> {
         }
     }
 
-    /**
-     * Method for multiplying RoundedDecimals.
-     *
-     * @param d A RoundedDecimal.
-     * @return The result.
-     */
-    @Override
-    public RoundedDecimal multiply(@NonNull final RoundedDecimal d) {
-        return new RoundedDecimal(value.multiply(d.value), d.mantissaLength);
-    }
-
-    /**
-     * Method for dividing RoundedDecimals.
-     *
-     * @param d A RoundedDecimal.
-     * @return The result.
-     */
-    @Override
-    @SuppressWarnings("MagicNumber")
-    public RoundedDecimal divide(@NonNull final RoundedDecimal d) {
-        return new RoundedDecimal(value.divide(d.value,
-                d.value.precision() + value.precision() + 20, RoundingMode.HALF_EVEN), d.mantissaLength);
-    }
-
-    /**
-     * Method for adding RoundedDecimals.
-     *
-     * @param d A RoundedDecimal.
-     * @return The result.
-     */
-    @Override
-    public RoundedDecimal add(@NonNull final RoundedDecimal d) {
-        return new RoundedDecimal(value.add(d.value), d.mantissaLength);
-    }
-
-    /**
-     * Method for creating a new RoundedDecimal from an existing one.
-     *
-     * @param s String representation of the number.
-     * @return A RoundedDecimal.
-     */
-    @Override
-    public RoundedDecimal create(@NonNull final String s) {
-        return new RoundedDecimal(s, this.mantissaLength);
-    }
-
-    /**
-     * Method for getting the value as BigDecimal.
-     *
-     * @return The value as BigDecimal rounded to 2 decimal places.
-     */
-    @Override
-    public BigDecimal toDecimal() {
-        return value.setScale(2, RoundingMode.HALF_EVEN).stripTrailingZeros();
-    }
-
-    @Override
-    public RoundedDecimal toInfinity(@NonNull final InfinityType type) {
-        return new RoundedDecimal(type);
-    }
-
-    @Override
-    public boolean isInfinite() {
-        return infinityType != null;
-    }
 }

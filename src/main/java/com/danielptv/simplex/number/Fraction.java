@@ -90,7 +90,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for multiplying two Fractions.
+     * Multiply two Fractions.
      *
      * @param f A Fraction.
      * @return The multiplied Fraction.
@@ -101,7 +101,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for dividing two Fractions.
+     * Divide two Fractions.
      *
      * @param f A Fraction.
      * @return The divided Fraction.
@@ -112,7 +112,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for adding two Fractions.
+     * Add two Fractions.
      *
      * @param f A Fraction.
      * @return The added Fraction.
@@ -124,7 +124,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for creating a new Fraction from an existing one.
+     * Create a new Fraction from an existing one.
      *
      * @param s String representation of the number.
      * @return The new Fraction.
@@ -135,7 +135,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     /**
-     * Method for getting the value as BigDecimal.
+     * Get the value as BigDecimal.
      *
      * @return The value as BigDecimal rounded to 2 decimal places.
      */
@@ -190,13 +190,6 @@ public class Fraction implements CalculableImpl<Fraction> {
         return numerator.abs() + "/" + denominator.abs();
     }
 
-    /**
-     * Method for simplifying Fractions.
-     *
-     * @param num   The numerator.
-     * @param denom The denominator.
-     * @return The simplified Fraction.
-     */
     private Pair<BigInteger, BigInteger> simplify(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
 
         if (num.equals(new BigInteger("0"))) {
@@ -215,13 +208,6 @@ public class Fraction implements CalculableImpl<Fraction> {
         return result;
     }
 
-    /**
-     * Methode for determining the greatest common divider.
-     *
-     * @param num   The numerator.
-     * @param denom The denominator.
-     * @return The greatest common divider.
-     */
     private BigInteger gcd(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
 
         var first = num.abs();

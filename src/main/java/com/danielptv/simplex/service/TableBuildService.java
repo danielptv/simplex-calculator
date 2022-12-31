@@ -23,11 +23,11 @@ public final class TableBuildService {
     }
 
     /**
-     * Method for building a Table.
+     * Build a table.
      *
-     * @param tableDTO DTO containing problem bounds and String-representation of the table.
+     * @param tableDTO DTO containing problem bounds and the table a list of strings.
      * @param <T>      Fraction or RoundedDecimal.
-     * @return A Simplex-Table.
+     * @return The table.
      */
     public static <T extends CalculableImpl<T>> Table<T> build(@NonNull final TableDTO<T> tableDTO) {
 
@@ -45,11 +45,11 @@ public final class TableBuildService {
         final var rowHeaders = enumerateRowHeaders(rowHeadersTemp, columnHeaders);
         final var pivot = setPivot(lHS, rHS, false, inst);
 
-        return new Table<>(inst, " ", lHS, null, rHS, pivot, columnHeaders, rowHeaders, 0);
+        return new Table<>(inst, " ", lHS, rHS, pivot, columnHeaders, rowHeaders, 0);
     }
 
     /**
-     * Helper-Method for building the left-hand side of a Table.
+     * Build the left-hand side of a table.
      *
      * @param table String-representation of the table.
      * @param inst  Fraction or RoundedDecimal.
@@ -67,7 +67,7 @@ public final class TableBuildService {
     }
 
     /**
-     * Helper-Method for building the right-hand side of a Simplex-Table.
+     * Build the right-hand side of a table.
      *
      * @param table String-representation of the table.
      * @param <T>   Fraction or RoundedDecimal.
@@ -83,11 +83,11 @@ public final class TableBuildService {
     }
 
     /**
-     * Helper-Method for building the column headers.
+     * Build the column headers.
      *
      * @param varCount        Number of variables.
      * @param constraintCount Number of constraints.
-     * @return The column headers as List of Strings.
+     * @return The column headers.
      */
     static @NonNull List<String> buildColumnHeaders(final int varCount, final int constraintCount) {
         return IntStream.range(1, varCount + constraintCount + 2)
@@ -104,7 +104,7 @@ public final class TableBuildService {
     }
 
     /**
-     * Helper-Method for building the row headers.
+     * Build the row headers.
      *
      * @param constraintCount Number of constraints.
      * @param negativeRows    Indices of all rows with negative right-hand side.
@@ -126,11 +126,11 @@ public final class TableBuildService {
     }
 
     /**
-     * Helper-Method for building an ArrayList representation of a Simplex-Table.
+     * Build a table as ArrayList.
      *
      * @param tableDTO Table as DTO containing the problem bounds.
      * @param <T>      Fraction or RoundedDecimal.
-     * @return The Simplex-Table as ArrayList.
+     * @return The table as ArrayList.
      */
     @SuppressWarnings({"MagicNumber", "CyclomaticComplexity", "NPathComplexity"})
     static <T extends CalculableImpl<T>> ArrayList<ArrayList<T>> buildTable(@NonNull final TableDTO<T> tableDTO) {
@@ -188,7 +188,7 @@ public final class TableBuildService {
     }
 
     /**
-     * Helper-Method for enumerating row headers based on the column the restriction is in.
+     * Enumerate the row headers based on the column the restriction is in.
      *
      * @param rowHeaders    The row headers to be enumerated.
      * @param columnHeaders The column headers.

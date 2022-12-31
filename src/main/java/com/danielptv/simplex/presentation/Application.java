@@ -19,13 +19,14 @@ public final class Application {
     }
 
     /**
-     * Method for starting the application.
+     * Start the application.
      *
      * @param args Optional parameters for starting the application.
      * @throws Exception Throws IOException if an I/O error occurs.
      */
     public static void main(final String[] args) throws Exception {
         out.println(FONT_GREEN + APPLICATION_HEADLINE + STYLE_RESET);
+
 
         final var problemBounds = getProblemBounds();
         final var problem = parseInput(problemBounds);

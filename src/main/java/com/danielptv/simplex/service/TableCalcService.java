@@ -22,7 +22,7 @@ final class TableCalcService {
     }
 
     /**
-     * Method for updating row headers.
+     * Update the row headers.
      *
      * @param columnHeaders Current column headers.
      * @param rowHeaders    Current row headers.
@@ -41,7 +41,7 @@ final class TableCalcService {
     }
 
     /**
-     * Method for retrieving the indices of all rows with negative right-hand side.
+     * Retrieve the indices of all rows with negative right-hand side.
      *
      * @param rHS  The right-hand side of the table.
      * @param inst Fraction or RoundedDecimal.
@@ -61,7 +61,7 @@ final class TableCalcService {
     }
 
     /**
-     * Method for setting the pivot element of a table.
+     * Set the pivot element of a table.
      *
      * @param lHS        The left-hand side of the table.
      * @param rHS        The right-hand side of the table.
@@ -101,7 +101,7 @@ final class TableCalcService {
     }
 
     /**
-     * Method for determining whether a table meets the criteria for a primary simplex table.
+     * Determine whether a table meets the criteria for a primary simplex table.
      *
      * @param table The table.
      * @param <T>   Fraction or RoundedDecimal.
@@ -109,7 +109,7 @@ final class TableCalcService {
      */
     static <T extends CalculableImpl<T>> boolean isValid(@NonNull final Table<T> table) {
 
-        final var isExtended = table.extendedLHS() != null;
+        final var isExtended = table.helperColumns() != 0;
         if (isExtended && !table.rHS().get(0).equals(table.inst().create("0"))) {
             return false;
         }
@@ -125,26 +125,25 @@ final class TableCalcService {
     }
 
     /**
-     * Method for determining whether a table is an optimal simplex table.
+     * Determine whether a table is an optimal simplex table.
      *
      * @param table The table.
      * @param <T>   Fraction or RoundedDecimal.
      * @return True if the table is optimal else false.
      */
     static <T extends CalculableImpl<T>> boolean isOptimal(@NonNull final Table<T> table) {
-        return table.lHS().get(0).isPositive() &&
-                (table.extendedLHS() == null || table.extendedLHS().get(0).isPositive());
+        return table.lHS().get(0).isPositive();
     }
 
     /**
-     * Method for determining whether an optimal solution is degenerate.
+     * Determine whether an optimal solution is degenerate.
      *
      * @param table The table.
      * @param <T>   Fraction or RoundedDecimal.
      * @return True if solution is degenerate else false.
      */
     static <T extends CalculableImpl<T>> boolean isDegenerate(@NonNull final Table<T> table) {
-        if (!isOptimal(table) || table.extendedLHS() != null) {
+        if (!isOptimal(table) || table.helperColumns() != 0) {
             throw new IllegalArgumentException();
         }
 

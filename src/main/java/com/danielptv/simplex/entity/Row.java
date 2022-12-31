@@ -57,9 +57,9 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for inverting a Row.
+     * Invert a row.
      *
-     * @return The inverted Row.
+     * @return The inverted row.
      */
     public Row<T> invertRow() {
         return new Row<>(entries.stream()
@@ -68,11 +68,11 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for multiplying a Row.
+     * Multiply a row.
      *
      * @param row    A row.
      * @param factor The factor.
-     * @return The multiplied Row.
+     * @return The multiplied row.
      */
     public Row<T> multiplyRow(@NonNull final Row<T> row, @NonNull final T factor) {
         return new Row<>(row.entries.stream()
@@ -81,10 +81,10 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for dividing a Row.
+     * Divide a row.
      *
      * @param divisor The divisor.
-     * @return The divided Row.
+     * @return The divided row.
      */
     public Row<T> divideRow(@NonNull final T divisor) {
         return new Row<>(entries.stream()
@@ -98,10 +98,10 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for adding two Rows.
+     * Add two rows.
      *
-     * @param addends A Row.
-     * @return The resulting Row.
+     * @param addends A row.
+     * @return The resulting row.
      */
     public Row<T> addRow(@NonNull final Row<T> addends) {
         if (addends.entries.size() != entries.size()) {
@@ -114,7 +114,7 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for adding a value to a Row.
+     * Add a value to a row.
      *
      * @param entry String representation of the value to be added.
      */
@@ -123,7 +123,7 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for determining if all entries are positive.
+     * Determine if all entries are positive.
      *
      * @return True if all entries are positive, else false.
      */
@@ -132,7 +132,7 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for getting the index of the smallest value.
+     * Get the index of the smallest value.
      *
      * @return The index.
      */
@@ -142,7 +142,7 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for getting an entry by its index.
+     * Get an entry by its index.
      *
      * @param index The index.
      * @return The entry.
@@ -172,7 +172,7 @@ public class Row<T extends CalculableImpl<T>> {
     }
 
     /**
-     * Method for setting the entry widths.
+     * Set the entry widths.
      */
     public void setEntryWidths() {
         entryWidths = new ArrayList<>(entries.stream().map(entry -> Math.max(entry.toString().length(), 2))
