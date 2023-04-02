@@ -12,8 +12,6 @@ Enjoy!
       <img src="media/simplex-calculator.png" alt="Example problem input" width="780" >
 </p>
 
-For a video demo see [Simplex Calculator](https://drive.google.com/drive/folders/1gH_82MVWjv0lWRdNeFJ7r9ySENtS2a6k?usp=sharing%3E).
-
 
 ## Calculation Modes
 
