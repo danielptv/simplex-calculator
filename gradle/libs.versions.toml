@@ -1,0 +1,7 @@
+[versions]
+javaVersion = "19"
+checkstyle = "10.6.0"
+lombok = "1.18.26"
+
+[libraries]
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok"}

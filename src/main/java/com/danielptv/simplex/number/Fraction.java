@@ -3,7 +3,6 @@ package com.danielptv.simplex.number;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import org.javatuples.Pair;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -47,8 +46,8 @@ public class Fraction implements CalculableImpl<Fraction> {
                 throw new IllegalArgumentException();
             }
             final var simplified = simplify(new BigInteger(split[0]), new BigInteger(split[1]));
-            numerator = simplified.getValue0();
-            denominator = simplified.getValue1();
+            numerator = simplified.value0();
+            denominator = simplified.value1();
             return;
         }
         if (fraction.contains(".")) {
@@ -59,8 +58,8 @@ public class Fraction implements CalculableImpl<Fraction> {
             final var num = new BigInteger(fraction.replace(".", ""));
             final var denom = BigDecimal.valueOf(Math.pow(10, split[1].length())).toBigInteger();
             final var simplified = simplify(num, denom);
-            numerator = simplified.getValue0();
-            denominator = simplified.getValue1();
+            numerator = simplified.value0();
+            denominator = simplified.value1();
             return;
         }
         numerator = new BigInteger(fraction);
@@ -78,8 +77,8 @@ public class Fraction implements CalculableImpl<Fraction> {
             throw new ArithmeticException();
         }
         final var simplified = simplify(num, denom);
-        numerator = simplified.getValue0();
-        denominator = simplified.getValue1();
+        numerator = simplified.value0();
+        denominator = simplified.value1();
         infinityType = null;
     }
 
@@ -190,20 +189,20 @@ public class Fraction implements CalculableImpl<Fraction> {
         return numerator.abs() + "/" + denominator.abs();
     }
 
-    private Pair<BigInteger, BigInteger> simplify(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
+    private Pair simplify(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
 
         if (num.equals(new BigInteger("0"))) {
-            return new Pair<>(new BigInteger("0"), new BigInteger("1"));
+            return new Pair(new BigInteger("0"), new BigInteger("1"));
         }
 
         var gcd = new BigInteger("2");
-        var result = new Pair<>(num, denom);
+        var result = new Pair(num, denom);
         while (gcd.intValue() > 1) {
-            gcd = gcd(result.getValue0(), result.getValue1());
+            gcd = gcd(result.value0(), result.value1());
 
-            final var newNum = result.getValue0().divide(gcd);
-            final var newDenom = result.getValue1().divide(gcd);
-            result = new Pair<>(newNum, newDenom);
+            final var newNum = result.value0().divide(gcd);
+            final var newDenom = result.value1().divide(gcd);
+            result = new Pair(newNum, newDenom);
         }
         return result;
     }
