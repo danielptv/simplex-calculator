@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.danielptv"
-version = "1.0"
+version = "1.0.0"
 
 java {
     toolchain {
@@ -19,11 +19,6 @@ repositories {
 dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
-
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }
 
 checkstyle {
@@ -33,4 +28,16 @@ checkstyle {
         "configDir" to "$projectDir/config/checkstyle",
     )
     isIgnoreFailures = false
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            mapOf(
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version,
+                "Main-Class" to "com.danielptv.simplex.presentation.Application"
+            )
+        )
+    }
 }
