@@ -1,5 +1,6 @@
 package com.danielptv.simplex.presentation;
 
+import com.danielptv.simplex.entity.ProblemType;
 import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.number.Fraction;
 import com.danielptv.simplex.number.RoundedDecimal;
@@ -21,6 +22,7 @@ import static java.lang.System.out;
  */
 public final class InputUtils {
     static final String NUMBER_PATTERN = "-?((\\d+(\\.\\d+)?)|(\\d+(/[0-9]*[1-9][0-9]*)?))";
+
     private InputUtils() {
     }
 
@@ -41,7 +43,7 @@ public final class InputUtils {
         input.add(getObjectiveFunc(varCount));
         input.addAll(getRestrictions(varCount, restrictCount));
 
-        return new TableDTO<>(tableDTO.inst(), input, varCount, restrictCount);
+        return new TableDTO<>(tableDTO.inst(), input, varCount, restrictCount, tableDTO.problemType());
     }
 
     /**
@@ -53,6 +55,7 @@ public final class InputUtils {
     static @NonNull TableDTO<?> getProblemBounds() {
         final var scan = new Scanner(System.in);
         final String calcMode;
+        final ProblemType problemType;
         int mantissaLength = 0;
 
         var falseInputCount = 0;
@@ -87,12 +90,31 @@ public final class InputUtils {
             }
         }
 
+        falseInputCount = 0;
+        while (true) {
+            if (falseInputCount > 0) {
+                out.print(FONT_RED + "  Maximize or minimize? [max/min] " + STYLE_RESET);
+            } else {
+                out.print("  Maximize or minimize? [max/min] ");
+            }
+            final var in = scan.nextLine();
+            if (in.matches("^max$")) {
+                problemType = ProblemType.MAX;
+                break;
+            }
+            if (in.matches("^min$")) {
+                problemType = ProblemType.MIN;
+                break;
+            }
+            falseInputCount++;
+        }
+
         final var varCount = getCount("variables");
         final var constraintCount = getCount("constraints");
         if ("n".equals(calcMode)) {
-            return new TableDTO<>(new Fraction(), varCount, constraintCount);
+            return new TableDTO<>(new Fraction(), varCount, constraintCount, problemType);
         }
-        return new TableDTO<>(new RoundedDecimal(mantissaLength), varCount, constraintCount);
+        return new TableDTO<>(new RoundedDecimal(mantissaLength), varCount, constraintCount, problemType);
     }
 
     /**
@@ -186,10 +208,10 @@ public final class InputUtils {
                 if (in.matches(pattern2)) {
                     final var sign = in.contains(">") ? ">" : in.contains("<") ? "<" : "=";
                     final var newIn = in.contains(">")
-                                    ? in.replace(">", ",")
-                                    : in.contains("<")
-                                    ? in.replace("<", ",")
-                                    : in.replace("=", ",");
+                            ? in.replace(">", ",")
+                            : in.contains("<")
+                            ? in.replace("<", ",")
+                            : in.replace("=", ",");
                     final var restriction = new ArrayList<>(Arrays.stream(newIn.split(",")).toList());
                     restriction.add(sign);
                     result.add(restriction);

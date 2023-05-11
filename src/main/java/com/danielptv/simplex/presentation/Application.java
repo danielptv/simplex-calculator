@@ -1,5 +1,7 @@
 package com.danielptv.simplex.presentation;
 
+import com.danielptv.simplex.entity.ProblemType;
+
 import static com.danielptv.simplex.presentation.InputUtils.getProblemBounds;
 import static com.danielptv.simplex.presentation.InputUtils.parseInput;
 import static com.danielptv.simplex.presentation.OutputUtils.FONT_GREEN;
@@ -27,14 +29,13 @@ public final class Application {
     public static void main(final String[] args) throws Exception {
         out.println(FONT_GREEN + APPLICATION_HEADLINE + STYLE_RESET);
 
-
         final var problemBounds = getProblemBounds();
         final var problem = parseInput(problemBounds);
         out.print(problem);
         final var table = build(problem);
         final var result = calc(table);
         result.forEach(out::println);
-        out.println(printPhaseResult(result.get(result.size() - 1)));
+        out.println(printPhaseResult(result.get(result.size() - 1), problem.problemType() == ProblemType.MIN));
 
         System.in.read();
     }

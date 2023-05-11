@@ -1,5 +1,6 @@
 package com.danielptv.simplex.service;
 
+import com.danielptv.simplex.entity.ProblemType;
 import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.entity.Table;
@@ -39,7 +40,7 @@ public final class TableBuildService {
         final var varCount = tableDTO.variablesCount();
         final var constraintCount = tableDTO.constraintCount();
         final var rHS = buildRHS(new ArrayList<>(table));
-        final var lHS = buildLHS(new ArrayList<>(table), inst);
+        final var lHS = buildLHS(new ArrayList<>(table), tableDTO.problemType().equals(ProblemType.MIN), inst);
         final var columnHeaders = buildColumnHeaders(varCount, constraintCount);
         final var rowHeadersTemp = buildRowHeaders(constraintCount, getNegativeRows(rHS, inst));
         final var rowHeaders = enumerateRowHeaders(rowHeadersTemp, columnHeaders);
@@ -52,18 +53,27 @@ public final class TableBuildService {
      * Build the left-hand side of a table.
      *
      * @param table String-representation of the table.
+     * @param minimize Whether the problem is to be minimized.
      * @param inst  Fraction or RoundedDecimal.
      * @param <T>   Fraction or RoundedDecimal.
      * @return The left-hand side.
      */
-    static <T extends CalculableImpl<T>> @NonNull List<Row<T>> buildLHS(@NonNull final ArrayList<ArrayList<T>> table,
-                                                                        @NonNull final T inst) {
-        return table.stream()
+    static <T extends CalculableImpl<T>> @NonNull List<Row<T>> buildLHS(
+            @NonNull final ArrayList<ArrayList<T>> table,
+            final boolean minimize,
+            @NonNull final T inst
+    ) {
+        final var rows = new ArrayList<>(table.stream()
                 .map(row -> {
                     row.remove(row.size() - 1);
                     return new Row<>(row, inst);
                 })
-                .toList();
+                .toList());
+        if (minimize) {
+            rows.set(0, rows.get(0).invertRow());
+            return rows;
+        }
+        return rows;
     }
 
     /**

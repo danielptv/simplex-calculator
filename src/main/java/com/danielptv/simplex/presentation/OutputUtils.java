@@ -1,10 +1,11 @@
 package com.danielptv.simplex.presentation;
 
-import com.danielptv.simplex.entity.Row;
-import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
+import com.danielptv.simplex.entity.ProblemType;
+import com.danielptv.simplex.entity.Row;
 import com.danielptv.simplex.entity.Table;
 import com.danielptv.simplex.entity.TableDTO;
+import com.danielptv.simplex.number.CalculableImpl;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -159,16 +160,17 @@ public final class OutputUtils {
      * @param tableDTO TableDTO containing the problem bounds.
      * @return The problem bounds as StringBuilder.
      */
-    @SuppressWarnings({"LambdaBodyLength", "MagicNumber"})
+    @SuppressWarnings({"LambdaBodyLength", "MagicNumber", "CyclomaticComplexity", "NPathComplexity"})
     public static StringBuilder printTableDTO(@NonNull final TableDTO<?> tableDTO) {
         final var sb = new StringBuilder();
         @NonNull final var input = tableDTO.table();
         final var restrictCount = tableDTO.constraintCount();
 
         sb.append(String.format("%n")).append(FONT_GREEN).append(String.format("  INPUT:%n"));
-        sb.append("  ZF: max ");
+        sb.append(tableDTO.problemType().equals(ProblemType.MAX) ? "  ZF: max " : "  ZF: min ");
         IntStream.range(0, input.get(0).size() - 2).forEach(x -> {
             final var pos = input.get(0).size();
+            // check if number < 0 or if number is a fraction
             final var number = input.get(0).get(x).contains("/") || input.get(0).get(x).contains("-")
                     ? "(" + input.get(0).get(x) + ")"
                     : input.get(0).get(x);
@@ -199,6 +201,11 @@ public final class OutputUtils {
             });
             sb.append(String.format("%n"));
         });
+
+        sb.append("  ");
+        IntStream.range(1, tableDTO.variablesCount()).forEach(variable -> sb.append("x").append(variable).append(","));
+        sb.append("x").append(tableDTO.variablesCount());
+        sb.append(" >= 0").append(String.format("%n"));
         sb.append(STYLE_RESET);
         return sb;
     }
@@ -207,13 +214,21 @@ public final class OutputUtils {
      * Print the final result of a simplex phase.
      *
      * @param phase A simplex phase.
+     * @param minimize Whether the problem is to be minimized.
      * @param <T>   Fraction or RoundedDecimal
      * @return The final result as StringBuilder.
      */
     @SuppressWarnings("MagicNumber")
-    static <T extends CalculableImpl<T>> StringBuilder printPhaseResult(@NonNull final Phase<T> phase) {
+    static <T extends CalculableImpl<T>> StringBuilder printPhaseResult(
+            @NonNull final Phase<T> phase,
+            final boolean minimize
+    ) {
         final var sb = new StringBuilder();
         final var table = phase.tables().get(phase.tables().size() - 1);
+
+        if (minimize) {
+            table.rHS().set(0, table.rHS().get(0).multiply(table.rHS().get(0).create("-1")));
+        }
 
         if (phase.specialSolutionType() != null && phase.specialSolutionType() != MULTIPLE_SOLUTIONS) {
             sb.append(FONT_RED);

@@ -14,12 +14,14 @@ import static com.danielptv.simplex.presentation.OutputUtils.printTableDTO;
  * @param variablesCount Number of variables.
  * @param constraintCount Number of constraints.
  * @param <T> Fraction or RoundedDecimal
+ * @param problemType Problem type (min/max)
  */
 public record TableDTO<T extends CalculableImpl<T>>(
         T inst,
         List<List<String>> table,
         int variablesCount,
-        int constraintCount
+        int constraintCount,
+        ProblemType problemType
 ) {
 
     /**
@@ -29,8 +31,8 @@ public record TableDTO<T extends CalculableImpl<T>>(
      * @param variablesCount  Number of variables.
      * @param constraintCount Number of constraints.
      */
-    public TableDTO(final T inst, final int variablesCount, final int constraintCount) {
-        this(inst, null, variablesCount, constraintCount);
+    public TableDTO(final T inst, final int variablesCount, final int constraintCount, final ProblemType problemType) {
+        this(inst, null, variablesCount, constraintCount, problemType);
     }
 
     @Override
