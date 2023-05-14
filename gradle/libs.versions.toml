@@ -2,6 +2,32 @@
 javaVersion = "19"
 checkstyle = "10.11.0"
 lombok = "1.18.26"
+springShell = "3.0.3"
+springBoot = "3.0.6"
+spotbugs = "4.7.3"
+jfiglet = "0.0.9"
+spotbugsPlugin = "5.0.13"
+jline = "3.23.0"
+
+# Test
+junit = "5.9.3"
+junitPlatformSuite = "1.9.3"
+assertj = "3.24.2"
 
 [libraries]
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok"}
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+springShell = { module = "org.springframework.shell:spring-shell-starter", version.ref = "springShell" }
+springBootTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+jline = { module = "org.jline:jline-terminal-jna", version.ref = "jline" }
+
+spotbugsAnnotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
+jfiglet = { module = "com.github.lalyos:jfiglet", version.ref = "jfiglet" }
+
+junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junitPlatformSuiteApi = { module = "org.junit.platform:junit-platform-suite-api", version.ref = "junitPlatformSuite" }
+junitPlatformSuiteEngine = { module = "org.junit.platform:junit-platform-suite-engine", version.ref = "junitPlatformSuite" }
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsPlugin" }

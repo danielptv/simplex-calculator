@@ -8,9 +8,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-/**
- * Class representing a fraction.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Fraction implements CalculableImpl<Fraction> {
     @EqualsAndHashCode.Include
@@ -23,22 +20,14 @@ public class Fraction implements CalculableImpl<Fraction> {
     @Getter
     private final InfinityType infinityType;
 
-    /**
-     * Constructor for a Fraction.
-     */
     public Fraction() {
         numerator = new BigInteger("0");
         denominator = new BigInteger("1");
         infinityType = null;
     }
 
-    /**
-     * Constructor for a Fraction.
-     *
-     * @param fraction String representation of the numerator.
-     */
     @SuppressWarnings({"ReturnCount", "MagicNumber"})
-    public Fraction(@NonNull final String fraction) {
+    public Fraction(final String fraction) {
         infinityType = null;
         if (fraction.contains("/")) {
             final var split = fraction.split("/");
@@ -66,13 +55,7 @@ public class Fraction implements CalculableImpl<Fraction> {
         denominator = new BigInteger("1");
     }
 
-    /**
-     * Constructor for a Fraction.
-     *
-     * @param num   String representation of the numerator
-     * @param denom String representation of the denominator.
-     */
-    public Fraction(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
+    public Fraction(final BigInteger num, final BigInteger denom) {
         if (denom.equals(new BigInteger("0"))) {
             throw new ArithmeticException();
         }
@@ -82,62 +65,42 @@ public class Fraction implements CalculableImpl<Fraction> {
         infinityType = null;
     }
 
-    private Fraction(@NonNull final InfinityType infinityType) {
+    private Fraction(final InfinityType infinityType) {
         numerator = null;
         denominator = null;
         this.infinityType = infinityType;
     }
 
-    /**
-     * Multiply two Fractions.
-     *
-     * @param f A Fraction.
-     * @return The multiplied Fraction.
-     */
     @Override
-    public Fraction multiply(@NonNull final Fraction f) {
+    public Fraction multiply(final Fraction f) {
+        if (this.isInfinite() || f.isInfinite()) {
+            return new Fraction(InfinityType.calculate(this.infinityType, f.infinityType));
+        }
         return new Fraction(numerator.multiply(f.numerator), denominator.multiply(f.denominator));
     }
 
-    /**
-     * Divide two Fractions.
-     *
-     * @param f A Fraction.
-     * @return The divided Fraction.
-     */
     @Override
-    public Fraction divide(@NonNull final Fraction f) {
+    public Fraction divide(final Fraction f) {
+        if (this.isInfinite() || f.isInfinite()) {
+            return new Fraction(InfinityType.calculate(this.infinityType, f.infinityType));
+        }
         return new Fraction(numerator.multiply(f.denominator), denominator.multiply(f.numerator));
     }
 
-    /**
-     * Add two Fractions.
-     *
-     * @param f A Fraction.
-     * @return The added Fraction.
-     */
     @Override
-    public Fraction add(@NonNull final Fraction f) {
+    public Fraction add(final Fraction f) {
+        if (this.isInfinite() || f.isInfinite()) {
+            return new Fraction(InfinityType.calculate(this.infinityType, f.infinityType));
+        }
         final var num = (numerator.multiply(f.denominator)).add(f.numerator.multiply(denominator));
         return new Fraction(num, denominator.multiply(f.denominator));
     }
 
-    /**
-     * Create a new Fraction from an existing one.
-     *
-     * @param s String representation of the number.
-     * @return The new Fraction.
-     */
     @Override
-    public Fraction create(@NonNull final String s) {
+    public Fraction create(final String s) {
         return new Fraction(s);
     }
 
-    /**
-     * Get the value as BigDecimal.
-     *
-     * @return The value as BigDecimal rounded to 2 decimal places.
-     */
     @Override
     public BigDecimal toDecimal() {
         final var num = new BigDecimal(numerator);
@@ -146,7 +109,7 @@ public class Fraction implements CalculableImpl<Fraction> {
     }
 
     @Override
-    public Fraction toInfinity(@NonNull final InfinityType type) {
+    public Fraction toInfinity(final InfinityType type) {
         return new Fraction(type);
     }
 
@@ -189,7 +152,7 @@ public class Fraction implements CalculableImpl<Fraction> {
         return numerator.abs() + "/" + denominator.abs();
     }
 
-    private Pair simplify(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
+    private Pair simplify(final BigInteger num, final BigInteger denom) {
 
         if (num.equals(new BigInteger("0"))) {
             return new Pair(new BigInteger("0"), new BigInteger("1"));
@@ -207,7 +170,7 @@ public class Fraction implements CalculableImpl<Fraction> {
         return result;
     }
 
-    private BigInteger gcd(@NonNull final BigInteger num, @NonNull final BigInteger denom) {
+    private BigInteger gcd(final BigInteger num, final BigInteger denom) {
 
         var first = num.abs();
         var second = denom.abs();
@@ -231,5 +194,9 @@ public class Fraction implements CalculableImpl<Fraction> {
             }
         }
         return result;
+    }
+
+    @SuppressWarnings("ClassMemberImpliedModifier")
+    record Pair(BigInteger value0, BigInteger value1) {
     }
 }

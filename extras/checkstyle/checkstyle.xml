@@ -2,30 +2,21 @@
 
 <!-- https://github.com/checkstyle/checkstyle/tree/master/src/main/resources/com/puppycrawl/tools/checkstyle -->
 <!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-    <!-- https://checkstyle.sourceforge.io/config_filters.html -->
-    <module name="SuppressionFilter">
-        <property name="file" value="${configDir}/checkstyle-suppressions.xml"/>
-        <property name="optional" value="false"/>
-    </module>
-
     <!-- https://checkstyle.sourceforge.net/config_misc.html -->
-	<module name="NewlineAtEndOfFile"/>
+    <module name="NewlineAtEndOfFile"/>
     <module name="OrderedProperties"/>
     <module name="Translation"/>
     <module name="UniqueProperties"/>
 
-	<!-- https://checkstyle.sourceforge.net/config_sizes.html -->
-	<module name="FileLength"/>
+    <!-- https://checkstyle.sourceforge.net/config_sizes.html -->
+    <module name="FileLength"/>
 
     <!-- https://checkstyle.sf.net/config_whitespace.html -->
     <module name="FileTabCharacter"/>
-
-    <!-- https://checkstyle.org/config_javadoc.html -->
-    <module name="JavadocPackage"/>
 
     <!-- https://checkstyle.org/config_sizes.html -->
     <module name="FileLength"/>
@@ -35,57 +26,33 @@
     </module>
 
     <module name="TreeWalker">
-		<!-- https://checkstyle.sourceforge.net/config_naming.html -->
+        <!-- https://checkstyle.sourceforge.net/config_naming.html -->
         <module name="AbbreviationAsWordInName"/>
-		<module name="AbstractClassName"/>
+        <module name="AbstractClassName"/>
         <module name="CatchParameterName"/>
         <module name="ClassTypeParameterName"/>
-		<module name="ConstantName"/>
+        <module name="ConstantName"/>
         <module name="IllegalIdentifierName"/>
         <module name="InterfaceTypeParameterName"/>
         <module name="LambdaParameterName"/>
-		<module name="LocalFinalVariableName"/>
-		<module name="LocalVariableName"/>
-		<module name="MemberName"/>
-		<module name="MethodName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
         <module name="MethodTypeParameterName"/>
-		<module name="PackageName"/>
-		<module name="ParameterName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
         <module name="PatternVariableName"/>
         <module name="RecordComponentName"/>
         <module name="RecordTypeParameterName"/>
-		<module name="StaticVariableName"/>
-		<module name="TypeName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_imports.html -->
-		<module name="AvoidStarImport"/>
-		<module name="IllegalImport"/>
-		<module name="RedundantImport"/>
-		<module name="UnusedImports"/>
-
-        <!-- https://checkstyle.org/config_javadoc.html -->
-        <module name="AtclauseOrder"/>
-        <module name="InvalidJavadocPosition"/>
-        <module name="JavadocBlockTagLocation"/>
-        <module name="JavadocContentLocationCheck"/>
-        <module name="JavadocMethod"/>
-        <module name="JavadocMissingLeadingAsterisk"/>
-        <module name="JavadocMissingWhitespaceAfterAsterisk"/>
-        <module name="JavadocParagraph"/>
-        <module name="JavadocStyle"/>
-        <module name="JavadocTagContinuationIndentation"/>
-        <module name="JavadocType"/>
-        <module name="JavadocVariable">
-            <property name="scope" value="public"/>
-        </module>
-        <module name="MissingJavadocMethod"/>
-        <module name="MissingJavadocPackage"/>
-        <module name="MissingJavadocType"/>
-        <module name="NonEmptyAtclauseDescription"/>
-        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
-        <module name="SingleLineJavadoc"/>
-        <module name="SummaryJavadocCheck"/>
-        <module name="WriteTag"/>
+        <!-- https://checkstyle.sourceforge.net/config_imports.html -->
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
 
         <!-- https://checkstyle.org/config_metrics.html -->
         <module name="BooleanExpressionComplexity"/>
@@ -95,32 +62,32 @@
         <module name="JavaNCSS"/>
         <module name="NPathComplexity"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_sizes.html -->
-		<module name="AnonInnerLength">
-			<property name="max" value="60"/>
-		</module>
+        <!-- https://checkstyle.sourceforge.net/config_sizes.html -->
+        <module name="AnonInnerLength">
+            <property name="max" value="60"/>
+        </module>
         <module name="ExecutableStatementCount"/>
         <module name="LambdaBodyLength"/>
-		<module name="MethodCount">
-			<property name="maxPublic" value="40"/>
-			<property name="maxProtected" value="10"/>
-			<property name="maxPackage" value="10"/>
-			<property name="maxPrivate" value="20"/>
-		</module>
-		<module name="MethodLength"/>
+        <module name="MethodCount">
+            <property name="maxPublic" value="40"/>
+            <property name="maxProtected" value="10"/>
+            <property name="maxPackage" value="10"/>
+            <property name="maxPrivate" value="20"/>
+        </module>
+        <module name="MethodLength"/>
         <module name="OuterTypeNumber"/>
-		<module name="ParameterNumber"/>
+        <module name="ParameterNumber"/>
         <module name="RecordComponentNumber"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_whitespace.html -->
-		<module name="EmptyForInitializerPad"/>
-		<module name="EmptyForIteratorPad"/>
-		<module name="GenericWhitespace"/>
-		<module name="MethodParamPad"/>
-		<module name="NoWhitespaceAfter"/>
-		<module name="NoWhitespaceBefore"/>
+        <!-- https://checkstyle.sourceforge.net/config_whitespace.html -->
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
         <module name="NoWhitespaceBeforeCaseDefaultColon"/>
-		<module name="OperatorWrap">
+        <module name="OperatorWrap">
             <property name="tokens" value="EQUAL,NOT_EQUAL,DIV,PLUS,MINUS,STAR,MOD,SR,BSR,GE,GT,SL,LE,LT,BXOR,BOR,LOR,BAND,LAND,LITERAL_INSTANCEOF,TYPE_EXTENSION_AND,ASSIGN,DIV_ASSIGN,PLUS_ASSIGN,MINUS_ASSIGN,STAR_ASSIGN,MOD_ASSIGN,SR_ASSIGN,BSR_ASSIGN,SL_ASSIGN,BXOR_ASSIGN,BOR_ASSIGN,BAND_ASSIGN,METHOD_REF"/>
             <property name="option" value="eol"/>
         </module>
@@ -128,72 +95,71 @@
             <property name="tokens" value="QUESTION,COLON"/>
             <property name="option" value="nl"/>
         </module>
-		<module name="ParenPad"/>
+        <module name="ParenPad"/>
         <module name="SeparatorWrap">
             <property name="tokens" value="DOT"/>
             <property name="option" value="nl"/>
         </module>
-		<module name="TypecastParenPad"/>
-		<module name="WhitespaceAfter"/>
-		<module name="WhitespaceAround"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_modifier.html -->
+        <!-- https://checkstyle.sourceforge.net/config_modifier.html -->
         <module name="ClassMemberImpliedModifier" />
-		<module name="ModifierOrder"/>
-		<module name="RedundantModifier"/>
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_blocks.html -->
-		<module name="AvoidNestedBlocks"/>
-		<module name="EmptyBlock">
+        <!-- https://checkstyle.sourceforge.net/config_blocks.html -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock">
             <property name="option" value="text"/>
         </module>
         <module name="EmptyCatchBlock"/>
-		<module name="LeftCurly"/>
-		<module name="NeedBraces"/>
-		<module name="RightCurly"/>
+        <module name="LeftCurly"/>
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_annotation.html -->
+        <!-- https://checkstyle.sourceforge.net/config_annotation.html -->
         <module name="AnnotationLocation"/>
-        <!-- <module name="AnnotationOnSameLine"/> -->
-		<module name="AnnotationUseStyle"/>
-		<module name="MissingDeprecated"/>
-		<module name="MissingOverride"/>
-		<module name="PackageAnnotation"/>
-		<module name="SuppressWarnings"/>
+        <module name="AnnotationUseStyle"/>
+        <module name="MissingDeprecated"/>
+        <module name="MissingOverride"/>
+        <module name="PackageAnnotation"/>
+        <module name="SuppressWarnings"/>
         <module name="SuppressWarningsHolder"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_coding.html -->
+        <!-- https://checkstyle.sourceforge.net/config_coding.html -->
         <module name="ArrayTrailingComma"/>
         <module name="AvoidDoubleBraceInitialization"/>
-		<module name="CovariantEquals"/>
+        <module name="CovariantEquals"/>
         <module name="DeclarationOrder"/>
-		<module name="DefaultComesLast"/>
+        <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>
-		<module name="EqualsAvoidNull"/>
+        <module name="EqualsAvoidNull"/>
         <module name="EqualsHashCode"/>
         <module name="ExplicitInitialization"/>
-		<module name="FallThrough"/>
-		<module name="FinalLocalVariable"/>
-		<module name="HiddenField">
-			<property name="ignoreConstructorParameter" value="true"/>
-			<property name="ignoreSetter" value="true"/>
-		</module>
+        <module name="FallThrough"/>
+        <module name="FinalLocalVariable"/>
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+        </module>
         <module name="IllegalCatch"/>
-		<module name="IllegalInstantiation"/>
-		<module name="IllegalThrows"/>
+        <module name="IllegalInstantiation"/>
+        <module name="IllegalThrows"/>
         <module name="IllegalToken"/>
         <module name="IllegalType"/>
-		<module name="InnerAssignment"/>
-		<module name="MagicNumber"/>
+        <module name="InnerAssignment"/>
+        <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
-		<module name="ModifiedControlVariable"/>
-		<module name="MultipleVariableDeclarations"/>
-		<module name="NestedForDepth">
-			<property name="max" value="1"/>
-		</module>
-		<module name="NestedIfDepth">
-			<property name="max" value="1"/>
-		</module>
+        <module name="ModifiedControlVariable"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="NestedForDepth">
+            <property name="max" value="1"/>
+        </module>
+        <module name="NestedIfDepth">
+            <property name="max" value="1"/>
+        </module>
         <module name="NestedTryDepth">
             <property name="max" value="1"/>
         </module>
@@ -203,17 +169,17 @@
         <module name="NoFinalizer"/>
         <module name="OneStatementPerLine"/>
         <module name="OverloadMethodsDeclarationOrder"/>
-		<module name="PackageDeclaration"/>
+        <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RequireThis"/>
         <module name="ReturnCount">
             <property name="max" value="3"/>
         </module>
-		<module name="SimplifyBooleanExpression"/>
-		<module name="SimplifyBooleanReturn"/>
-		<module name="StringLiteralEquality"/>
-		<module name="SuperClone"/>
-		<module name="SuperFinalize"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="SuperClone"/>
+        <module name="SuperFinalize"/>
         <module name="UnnecessaryParentheses"/>
         <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
         <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
@@ -222,32 +188,32 @@
         <module name="UnusedLocalVariable"/>
         <module name="VariableDeclarationUsageDistance"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_design.html -->
+        <!-- https://checkstyle.sourceforge.net/config_design.html -->
         <module name="FinalClass"/>
-		<module name="HideUtilityClassConstructor"/>
+        <module name="HideUtilityClassConstructor"/>
         <module name="InnerTypeLast"/>
-		<module name="InterfaceIsType"/>
+        <module name="InterfaceIsType"/>
         <module name="MutableException"/>
         <module name="OneTopLevelClass"/>
         <module name="ThrowsCount"/>
-		<module name="VisibilityModifier"/>
+        <module name="VisibilityModifier"/>
 
-		<!-- https://checkstyle.sourceforge.net/config_misc.html -->
-		<module name="ArrayTypeStyle"/>
+        <!-- https://checkstyle.sourceforge.net/config_misc.html -->
+        <module name="ArrayTypeStyle"/>
         <module name="AvoidEscapedUnicodeCharacters"/>
         <module name="CommentsIndentation"/>
         <module name="FinalParameters"/>
         <module name="Indentation"/>
         <module name="NoCodeInFile"/>
         <module name="OuterTypeFilename"/>
-		<module name="TodoComment">
+        <module name="TodoComment">
             <property name="format" value="(TODO)|(FIXME)"/>
             <property name="severity" value="info"/>
         </module>
         <module name="TrailingComment"/>
         <module name="UncommentedMain">
-    		<property name="excludedClasses" value="\.Application$"/>
-		</module>
+            <property name="excludedClasses" value="\.com.danielptv.simplex.Application$"/>
+        </module>
         <module name="UpperEll"/>
 
         <!-- Enable suppression comments -->

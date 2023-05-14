@@ -1,10 +1,11 @@
 package com.danielptv.simplex.service;
 
-import com.danielptv.simplex.number.CalculableImpl;
 import com.danielptv.simplex.entity.Phase;
 import com.danielptv.simplex.entity.Row;
-import com.danielptv.simplex.entity.Table;
-import lombok.NonNull;
+import com.danielptv.simplex.entity.SimplexTable;
+import com.danielptv.simplex.number.CalculableImpl;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,131 +14,86 @@ import java.util.stream.IntStream;
 import static com.danielptv.simplex.entity.SpecialSolutionType.INFEASIBLE;
 import static com.danielptv.simplex.entity.SpecialSolutionType.MULTIPLE_SOLUTIONS;
 import static com.danielptv.simplex.entity.SpecialSolutionType.UNBOUNDED;
-import static com.danielptv.simplex.presentation.OutputUtils.PHASE_1;
-import static com.danielptv.simplex.presentation.OutputUtils.PHASE_2;
-import static com.danielptv.simplex.presentation.OutputUtils.SIMPLEX_HEADLINE;
-import static com.danielptv.simplex.service.TableCalcService.isDegenerate;
-import static com.danielptv.simplex.service.TableCalcService.isOptimal;
-import static com.danielptv.simplex.service.TableCalcService.isValid;
-import static com.danielptv.simplex.service.TableCalcService.setPivot;
-import static com.danielptv.simplex.service.TableCalcService.updateRowHeaders;
-import static com.danielptv.simplex.service.TableExtensionService.buildExtension;
-import static com.danielptv.simplex.service.TableExtensionService.removeExtension;
 
-/**
- * Service-Class for simplex calculations.
- */
-public final class TwoPhaseSimplex {
+@RequiredArgsConstructor
+@SuppressFBWarnings("EI_EXPOSE_REP2")
+public final class TwoPhaseSimplex<T extends CalculableImpl<T>> {
+    private final T generator;
+    private final TableCalcService<T> calcService;
+    private final TableExtensionService<T> extensionService;
 
-    private TwoPhaseSimplex() {
-
-    }
-
-    /**
-     * Calculate a linear problem.
-     *
-     * @param simplexTable The initial simplex table.
-     * @param <T>          Fraction or RoundedDecimal.
-     * @return A List containing the resulting simplex phases.
-     */
-    public static <T extends CalculableImpl<T>> List<Phase<T>> calc(@NonNull final Table<T> simplexTable) {
+    public List<Phase<T>> calc(final SimplexTable<T> simplexTable) {
         final var result = new ArrayList<Phase<T>>(2);
         var table = simplexTable;
 
         // optional phase 1
-        if (!isValid(table)) {
+        if (calcService.isInvalid(table)) {
             final var phase = phase1(table);
             result.add(phase);
 
             if (phase.specialSolutionType() != null) {
                 return result;
             }
-            table = removeExtension(phase.getLastTable());
+            table = extensionService.removeExtension(phase.getLastTable());
         }
 
         // primary simplex algorithm
-        final var headline = result.isEmpty() ? SIMPLEX_HEADLINE : PHASE_2;
-        result.add(phase2(table, headline));
+        result.add(phase2(table, result.isEmpty()));
         return result;
     }
 
-    /**
-     * Calculate the first phase of the two phase simplex method.
-     *
-     * @param simplexTable The initial simplex table.
-     * @param <T>          Fraction or RoundedDecimal.
-     * @return A Phase containing all intermediary tables.
-     */
-    static <T extends CalculableImpl<T>> Phase<T> phase1(@NonNull final Table<T> simplexTable) {
-        final var tables = new ArrayList<Table<T>>();
-        final var inst = simplexTable.inst();
+    Phase<T> phase1(final SimplexTable<T> simplexTable) {
+        final var tables = new ArrayList<SimplexTable<T>>();
 
         // add helper columns
-        var table = buildExtension(simplexTable);
+        var table = extensionService.buildExtension(simplexTable);
 
         // transform table to its canonical form
         table = transformToCanonical(table);
-        tables.add(new Table<>(table, "INITIAL TABLE"));
+        tables.add(new SimplexTable<>(table, "INITIAL TABLE"));
 
         // transform table until acceptable for primary simplex
-        for (int count = 1; !isValid(table); ++count) {
+        for (int count = 1; calcService.isInvalid(table); ++count) {
             table = transform(table);
-            tables.add(new Table<>(table, "ITERATION " + count));
+            tables.add(new SimplexTable<>(table, "ITERATION " + count));
 
-            if (isOptimal(table) && !table.rHS().get(0).equals(inst.create("0"))) {
-                return new Phase<>(PHASE_1, tables, INFEASIBLE);
+            if (calcService.isOptimal(table) && !table.rHS().get(0).equals(generator.create("0"))) {
+                return new Phase<>(tables, INFEASIBLE, false);
             }
         }
-        return new Phase<>(PHASE_1, tables, null);
+        return new Phase<>(tables, null, false);
     }
 
-    /**
-     * The primary simplex.
-     *
-     * @param simplexTable The initial simplex table.
-     * @param headline     The headline for the phase.
-     * @param <T>          Fraction or RoundedDecimal.
-     * @return A Phase containing all intermediary tables.
-     */
-    static <T extends CalculableImpl<T>> Phase<T> phase2(@NonNull final Table<T> simplexTable,
-                                                         @NonNull final String headline) {
-        final var tables = new ArrayList<Table<T>>();
+    Phase<T> phase2(final SimplexTable<T> simplexTable, final boolean singlePhase) {
+        final var tables = new ArrayList<SimplexTable<T>>();
         var table = simplexTable;
 
-        tables.add(new Table<>(table, "INITIAL TABLE"));
+        tables.add(new SimplexTable<>(table, "INITIAL TABLE"));
 
         // transform the table until an optimal solution is found
-        for (int count = 1; !isOptimal(table); ++count) {
+        for (int count = 1; !calcService.isOptimal(table); ++count) {
             table = transform(table);
-            tables.add(new Table<>(table, "ITERATION " + count));
+            tables.add(new SimplexTable<>(table, "ITERATION " + count));
 
             final var pivotElement = table.pivot();
             if (pivotElement.value().isInfinite()) {
-                return new Phase<>(headline, tables, UNBOUNDED);
+                return new Phase<>(tables, UNBOUNDED, singlePhase);
             }
         }
-        if (isDegenerate(table)) {
-            return new Phase<>(headline, tables, MULTIPLE_SOLUTIONS);
+        if (calcService.isDegenerate(table)) {
+            return new Phase<>(tables, MULTIPLE_SOLUTIONS, singlePhase);
         }
-        return new Phase<>(headline, tables, null);
+        return new Phase<>(tables, null, singlePhase);
     }
 
-    /**
-     * Transform a table during an iteration.
-     *
-     * @param table A table.
-     * @param <T>   Fraction or RoundedDecimal.
-     * @return The resulting table.
-     */
     @SuppressWarnings("LambdaBodyLength")
-    public static <T extends CalculableImpl<T>> @NonNull Table<T> transform(@NonNull final Table<T> table) {
-        final var inst = table.inst();
+    public SimplexTable<T> transform(final SimplexTable<T> table) {
         final var rowCount = table.rHS().size();
         final var columnHeaders = table.columnHeaders();
         final var pivot = table.pivot();
 
         var rowHeaders = table.rowHeaders();
-        rowHeaders = updateRowHeaders(columnHeaders, table.rowHeaders(), pivot);
+        rowHeaders = calcService.updateRowHeaders(columnHeaders, table.rowHeaders(), pivot);
 
         // find divisor and divide
         final var divisor = pivot.value();
@@ -150,7 +106,7 @@ public final class TwoPhaseSimplex {
         //find factors
         final List<T> factors;
         factors = lHS.stream()
-                .map(e -> e.getElement(pivot.column()).multiply(inst.create("-1")))
+                .map(e -> e.getElement(pivot.column()).multiply(generator.create("-1")))
                 .toList();
 
         //iterate
@@ -169,14 +125,8 @@ public final class TwoPhaseSimplex {
                     }
                 });
 
-        final var newPivot = setPivot(
-                lHS,
-                rHS,
-                table.helperColumns() != 0,
-                inst);
-
-        return new Table<>(
-                inst,
+        final var newPivot = calcService.setPivot(lHS, rHS, table.helperColumns() != 0);
+        return new SimplexTable<>(
                 table.title(),
                 lHS,
                 rHS,
@@ -186,20 +136,12 @@ public final class TwoPhaseSimplex {
                 table.helperColumns());
     }
 
-    /**
-     * Transform a table to its canonical form.
-     *
-     * @param table A Simplex-Table.
-     * @param <T>   Fraction or RoundedDecimal
-     * @return The transformed table.
-     */
-    public static <T extends CalculableImpl<T>> @NonNull Table<T> transformToCanonical(@NonNull final Table<T> table) {
+    public SimplexTable<T> transformToCanonical(final SimplexTable<T> table) {
 
         if (table.helperColumns() == 0) {
             throw new IllegalArgumentException();
         }
 
-        final var inst = table.inst();
         final var extensionSize = table.helperColumns();
         final var lHs = new ArrayList<>(table.lHS());
         final var rHS = new ArrayList<>(table.rHS());
@@ -209,13 +151,12 @@ public final class TwoPhaseSimplex {
                 .forEach(i -> {
                     if (rowHeaders.get(i).contains("h")) {
                         lHs.set(0, lHs.get(0).addRow(lHs.get(i).invertRow()));
-                        rHS.set(0, rHS.get(0).add(rHS.get(i).multiply(inst.create("-1"))));
+                        rHS.set(0, rHS.get(0).add(rHS.get(i).multiply(generator.create("-1"))));
                     }
                 });
 
-        final var pivot = setPivot(lHs, rHS, true, inst);
-        return new Table<>(
-                inst,
+        final var pivot = calcService.setPivot(lHs, rHS, true);
+        return new SimplexTable<>(
                 table.title(),
                 lHs,
                 rHS,

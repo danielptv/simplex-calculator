@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: production
+  shell.command:
+    history.enabled: false
+    script.enabled: false
+shell:
+  out:
+    info: CYAN
+    success: GREEN
+    warning: YELLOW
+    error: RED
+---
+logging:
+  pattern:
+    console:
+spring:
+  config:
+    activate:
+      on-profile: production

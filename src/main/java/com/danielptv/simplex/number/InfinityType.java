@@ -1,16 +1,7 @@
 package com.danielptv.simplex.number;
 
-/**
- * Enum for the types of infinity.
- */
 public enum InfinityType {
-    /**
-     * Positive infinity.
-     */
     POSITIVE("inf"),
-    /**
-     * Negative infinity.
-     */
     NEGATIVE("minf");
     private final String value;
 
@@ -35,5 +26,15 @@ public enum InfinityType {
             return o1.equals(POSITIVE) ? 1 : -1;
         }
         return o2.equals(NEGATIVE) ? 1 : -1;
+    }
+
+    static InfinityType calculate(final InfinityType o1, final InfinityType o2) {
+        if (o1 != null && o2 != null) {
+            throw new IllegalArgumentException();
+        }
+        if (o1 == null && o2 == null) {
+            return null;
+        }
+        return o1 != null ? o1 : o2;
     }
 }
