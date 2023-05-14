@@ -4,6 +4,12 @@
 A console application for linear programming problems solving.
 </p>
 
+<p align="center">
+  <a href="https://github.com/danielptv/simplex-calculator">
+    <img src="https://github.com/danielptv/simplex-calculator/assets/93288603/09e2e1fc-f315-4623-bcd3-a7af5c865516" alt="Simplex Calculator">
+  </a>
+</p>
+
 ## About
 
 The app uses the traditional simplex method as well as the two-phase method, where applicable. This program serves
