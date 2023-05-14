@@ -98,9 +98,9 @@ public class SimplexIO {
             });
             sb.append(String.format("%n"));
         });
-        IntStream.range(1, objectiveFunction.size()).forEach(variable -> {
-            sb.append("x").append(SubscriptNumbers.values()[variable]).append(",");
-        });
+        IntStream.range(1, objectiveFunction.size()).forEach(variable -> sb.append("x")
+                .append(SubscriptNumbers.values()[variable])
+                .append(","));
         sb.append("x").append(SubscriptNumbers.values()[objectiveFunction.size()]);
         sb.append(String.format(" ≥ 0%n"));
         return sb;
@@ -125,7 +125,9 @@ public class SimplexIO {
             IntStream.range(0, phaseModels.size()).forEach(phaseTable -> {
                 sb.append(phase.tables().get(phaseTable).title()).append(String.format("%n"));
                 final var model = phaseModels.get(phaseTable);
-                final var printTable = tableBuilder.build(model, !phase.singlePhase(), phaseColumnWidths);
+                final var twoObjFunc = phase.getLastTable().rows() >
+                        result.get(result.size() - 1).getLastTable().rows();
+                final var printTable = tableBuilder.build(model, twoObjFunc, phaseColumnWidths);
                 sb.append(printTable.render(100)).append(String.format("%n"));
             });
         });
