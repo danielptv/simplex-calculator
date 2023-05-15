@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.danielptv.simplex-calculator.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.danielptv.simplex-calculator.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simplex-calculator.iml" filepath="$PROJECT_DIR$/.idea/modules/simplex-calculator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/simplex-calculator.main.iml" filepath="$PROJECT_DIR$/.idea/modules/simplex-calculator.main.iml" />
+    </modules>
+  </component>
+</project>
