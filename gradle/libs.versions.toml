@@ -1,5 +1,5 @@
 [versions]
-javaVersion = "19"
+javaVersion = "20"
 checkstyle = "10.11.0"
 lombok = "1.18.26"
 springShell = "3.0.3"

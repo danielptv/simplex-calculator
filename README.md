@@ -32,7 +32,7 @@ educational purposes.
 
 The app is implemented using Spring Shell and requires a recent version of Java:
 
-* [Java](https://adoptium.net/temurin/releases/?version=19)
+* [Java](https://adoptium.net/temurin/releases/?version=20)
 
 If you are using Windows a modern terminal and a recent version of PowerShell are also highly recommended:
 
@@ -64,13 +64,13 @@ calc --var 2 --const 5 --round false
 
 **Available options:**
 
-| Option              | Meaning                                                                  |
-|---------------------|--------------------------------------------------------------------------|
-| --var or -v         | Number of variables, i.e. [2].                                           |
-| --const or -c       | Number of constraints, i. e. [3].                                        |
-| --round or -r       | Mantissa length to round to, i.e. [2]. Pass [false] to disable rounding. |
-| --min or -m boolean | Pass to minimize the problem, omit otherwise.                            |
-| --help or -h        | Help for the command.                                                    |
+| Option        | Meaning                                                                  |
+|---------------|--------------------------------------------------------------------------|
+| --var or -v   | Number of variables, i.e. [2].                                           |
+| --const or -c | Number of constraints, i. e. [3].                                        |
+| --round or -r | Mantissa length to round to, i.e. [2]. Pass [false] to disable rounding. |
+| --min or -m   | Pass to minimize the problem, omit otherwise.                            |
+| --help or -h  | Help for the command.                                                    |
 
 When prompted, enter the objective function and all restrictions as comma seperated lists. Do not enter the slack
 variables.
