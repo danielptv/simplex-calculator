@@ -1,9 +1,7 @@
 package com.danielptv.simplex.dev;
 
-import com.danielptv.simplex.shell.InputReader;
 import com.danielptv.simplex.shell.PromptColor;
-import com.danielptv.simplex.shell.ShellHelper;
-import org.jline.reader.LineReader;
+import com.danielptv.simplex.shell.OutputHelper;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
@@ -23,12 +21,7 @@ public class ShellApplicationConfig implements PromptProvider {
     }
 
     @Bean
-    ShellHelper shellHelper(@Lazy final Terminal terminal) {
-        return new ShellHelper(terminal);
-    }
-
-    @Bean
-    InputReader inputReader(@Lazy final Terminal terminal, @Lazy final LineReader lineReader) {
-        return new InputReader(lineReader, new ShellHelper(terminal));
+    OutputHelper shellHelper(@Lazy final Terminal terminal) {
+        return new OutputHelper(terminal);
     }
 }

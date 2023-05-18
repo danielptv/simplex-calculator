@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: production
+    active: dev
   shell.command:
     history.enabled: false
     script.enabled: false
@@ -14,6 +14,7 @@ shell:
 logging:
   pattern:
     console:
+spring.shell.command.stacktrace.enabled: false
 spring:
   config:
     activate:

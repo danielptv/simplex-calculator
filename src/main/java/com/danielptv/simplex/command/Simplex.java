@@ -8,9 +8,11 @@ import com.danielptv.simplex.service.TableBuildService;
 import com.danielptv.simplex.service.TableCalcService;
 import com.danielptv.simplex.service.TableExtensionService;
 import com.danielptv.simplex.service.TwoPhaseSimplex;
+import com.danielptv.simplex.shell.EditType;
+import com.danielptv.simplex.shell.InputResult;
+import com.danielptv.simplex.shell.OutputHelper;
 import com.danielptv.simplex.shell.PromptColor;
-import com.danielptv.simplex.shell.ShellHelper;
-import com.danielptv.simplex.shell.SimplexIO;
+import com.danielptv.simplex.shell.SimplexOutput;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -21,6 +23,7 @@ import org.springframework.shell.standard.ShellOption;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @ShellComponent
 @RequiredArgsConstructor
@@ -30,8 +33,10 @@ public class Simplex {
     private static final String ROUND_PATTERN = "^(false|\\d{1,2})$";
     private static final int MIN_COUNT = 1;
     private static final int MAX_COUNT = 10;
-    private final ShellHelper shellHelper;
-    private final SimplexIO simplexIO;
+    private final OutputHelper outputHelper;
+    private final SimplexOutput simplexOutput;
+
+    private final HelperComponent helperComponent;
 
     @ShellMethod(key = {"calculate", "calc"}, value = "Calculate Simplex")
     public void calc(
@@ -43,20 +48,68 @@ public class Simplex {
             @Pattern(regexp = ROUND_PATTERN) final String roundMode,
             @ShellOption(value = {"-m", "--min"}, help = MIN_HELP) final boolean minimize
     ) {
-        final var objectiveFunction = simplexIO.getObjectiveFunction(varCount);
-        final var constraints = simplexIO.getConstraints(varCount, constCount);
-        shellHelper.print(simplexIO.displayProblem(objectiveFunction, constraints, minimize)
-                .toString(), PromptColor.GREEN);
+        var objectiveFunction = helperComponent.simplexInput(
+                "Objective function:",
+                varCount,
+                true,
+                minimize
+        );
+        var constraints = IntStream.range(0, constCount)
+                .mapToObj(c -> helperComponent.simplexInput(String.format("Constraint %d:", c + 1),
+                        varCount,
+                        false,
+                        minimize
+                ))
+                .toList();
+        outputHelper.print(simplexOutput.displayProblem(objectiveFunction, constraints).toString(), PromptColor.GREEN);
 
+        var edit = helperComponent.editProblem();
+        while (!edit.equals(EditType.CONTINUE)) {
+            objectiveFunction = helperComponent.simplexInput(
+                    "Objective function:",
+                    varCount,
+                    true,
+                    minimize,
+                    objectiveFunction
+            );
+            final var finalConstraints = constraints;
+            constraints = IntStream.range(0, constCount)
+                    .mapToObj(c -> helperComponent.simplexInput(String.format("Constraint %d:", c + 1),
+                            varCount,
+                            false,
+                            minimize,
+                            finalConstraints.get(c)
+                    ))
+                    .toList();
+            outputHelper.print(simplexOutput.displayProblem(objectiveFunction, constraints)
+                    .toString(), PromptColor.GREEN);
+            edit = helperComponent.editProblem();
+        }
+
+        outputHelper.print(String.format("%n"));
         final List<Phase<? extends CalculableImpl<?>>> phases;
         if ("false".equals(roundMode)) {
             final var number = new Fraction();
-            phases = executeSimplex(number, varCount, constCount, minimize, objectiveFunction, constraints);
+            phases = executeSimplex(
+                    number,
+                    varCount,
+                    constCount,
+                    minimize,
+                    objectiveFunction.getValues(),
+                    constraints.stream().map(InputResult::getValues).toList()
+            );
         } else {
             final var number = new RoundedDecimal(Integer.parseInt(roundMode));
-            phases = executeSimplex(number, varCount, constCount, minimize, objectiveFunction, constraints);
+            phases = executeSimplex(
+                    number,
+                    varCount,
+                    constCount,
+                    minimize,
+                    objectiveFunction.getValues(),
+                    constraints.stream().map(InputResult::getValues).toList()
+            );
         }
-        shellHelper.print(simplexIO.printResult(phases).toString());
+        outputHelper.print(simplexOutput.printResult(phases).toString());
     }
 
     <T extends CalculableImpl<T>> List<Phase<? extends CalculableImpl<?>>> executeSimplex(

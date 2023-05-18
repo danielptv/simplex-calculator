@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 @SuppressFBWarnings("EI_EXPOSE_REP2")
-public class ShellHelper {
+public class OutputHelper {
     @Value("${shell.out.info}")
     private String infoColor;
     @Value("${shell.out.success}")
@@ -25,11 +25,7 @@ public class ShellHelper {
                 .append(message, AttributedStyle.DEFAULT.foreground(color.toJlineAttributedStyle()))
                 .toAnsi();
     }
-    public String getColoredBackground(final String message, final PromptColor color) {
-        return (new AttributedStringBuilder())
-                .append(message, AttributedStyle.DEFAULT.background(color.toJlineAttributedStyle()))
-                .toAnsi();
-    }
+
     public String getInfoMessage(final String message) {
         return getColored(message, PromptColor.valueOf(infoColor));
     }

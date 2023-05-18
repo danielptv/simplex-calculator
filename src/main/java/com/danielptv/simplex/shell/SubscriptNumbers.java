@@ -10,8 +10,7 @@ public enum SubscriptNumbers {
     SIX("₆"),
     SEVEN("₇"),
     EIGHT("₈"),
-    NINE("₉"),
-    TEN("₁₀");
+    NINE("₉");
 
     private final String value;
 
@@ -22,5 +21,15 @@ public enum SubscriptNumbers {
     @Override
     public String toString() {
         return this.value;
+    }
+
+    public static String toValue(final int number) {
+        final var digits = String.valueOf(number).toCharArray();
+        final var result = new StringBuilder();
+        for (char c : digits) {
+            final var num = SubscriptNumbers.values()[Integer.parseInt(String.valueOf(c))];
+            result.append(num);
+        }
+        return result.toString();
     }
 }
