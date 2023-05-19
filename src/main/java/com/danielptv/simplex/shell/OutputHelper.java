@@ -6,9 +6,11 @@ import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @SuppressFBWarnings("EI_EXPOSE_REP2")
+@Component
 public class OutputHelper {
     @Value("${shell.out.info}")
     private String infoColor;

@@ -135,8 +135,8 @@ public class SimplexInput extends AbstractTextComponent<InputResult, SimplexInpu
         }
         if (!input.matches(standardPattern) && isObjFunction ||
                 !input.matches(standardPattern) && !input.matches(relSignPattern)) {
-            inputResult.setRepresentation("Invalid function");
-            context.setMessage("Invalid function", MessageLevel.ERROR);
+            inputResult.setRepresentation("Invalid input");
+            context.setMessage("Invalid input", MessageLevel.ERROR);
             return false;
         } else {
             final var current = buildCurrent(input);
