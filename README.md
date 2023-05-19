@@ -49,12 +49,12 @@ java -jar simplex-calc.jar
 
 ## How To Use
 
-For general guidance and command documentation use the provided ***help*** command or ***calc --help*** for simplex
+For general guidance and command documentation use the provided `help` command or `calc --help` for simplex
 specific documentation.
 
 ### Simplex
 
-You can start a simplex calculation by using the ***calc*** command:
+You can start a simplex calculation by using the `calc` command:
 
 ````bash
 calc --var <number of variables> --const <number of constraints> --round <false or mantissa length>
@@ -92,11 +92,11 @@ Subject to:
 
 ````text
 Objective function: 6,4
-R1: 1,2<3000
-R2: 2,1<3000
-R3: 1,0<1100
-R4: 0,1<1200
-R5: 1,0>500
+Constraint 1: 1,2<3000
+Constraint 2: 2,1<3000
+Constraint 3: 1,0<1100
+Constraint 4: 0,1<1200
+Constraint 5: 1,0>500
 ````
 
 After entering all the data the solution to the problem will be calculated and the intermediate tables will be
@@ -130,12 +130,12 @@ at the last tableau as it contains the vector of the reduced costs as well as ot
 
 ### Calculation Modes
 
-Calculation modes are controlled by the ***--round*** option described above. Following modes are available:
+Calculation modes are controlled by the `--round` option described above. Following modes are available:
 
-* **Exact:** Calculation with simplified fractions.
+* **Exact:** Calculation with simplified fractions (`--round false`).
 * **Rounded**: Calculation with decimals rounded to a variable mantissa using optimal rounding and "round half to even".
-  Rounding takes place after each step of the calculation.
+  Rounding takes place after each step of the calculation (`--round [int]`).
 
 ### Number Input
 
-Numbers can be entered as integer, fraction or decimal number, e.g. ***123***, ***123/321*** or ***123.321***.
+Numbers can be entered as integer, fraction or decimal number, e.g. `123`, `123/321` or `123.321`.
